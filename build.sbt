@@ -1,6 +1,6 @@
 lazy val root = (project in file("."))
   .settings(
-    name         := "coreapi",
+    name         := "core",
     organization := "github.discordscala",
     scalaVersion := "2.12.4",
     version      := "0.1.0-SNAPSHOT",
