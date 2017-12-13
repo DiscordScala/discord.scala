@@ -4,6 +4,8 @@ import github.discordscala.core.Client
 import github.discordscala.core.util.RequestUtil
 import spire.math.ULong
 
+import github.discordscala.core.DiscordScala._
+
 case class User(id: ULong, username: String, discriminator: String, avatar: String, bot: Option[Boolean], mfa: Option[Boolean], verified: Option[Boolean], email: Option[String]) extends Snowflaked
 object User {
 
