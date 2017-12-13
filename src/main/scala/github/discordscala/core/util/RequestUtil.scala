@@ -19,7 +19,6 @@ object RequestUtil {
   implicit val materializer = ActorMaterializer()
 
   def restRequestFuture(url: String, headers: Map[String, String], method: RequestMethod = Get, body: Option[(String, String)] = None): Future[JValue] = Future {
-    println("started req")
     var status = 0
     var strResponse: String = null
     do {
@@ -35,7 +34,6 @@ object RequestUtil {
       val waitResponse = request.send()
       val response = Await.result(waitResponse, Duration.Inf)
       status = response.code
-      println(status)
       if(status == 429) {
         val unRatelimitTime = response.header("X-RateLimit-Reset").get.toLong
         Thread.sleep(System.currentTimeMillis() - (unRatelimitTime * 1000 + 500))
@@ -50,7 +48,6 @@ object RequestUtil {
         }
       }
     } while (status == 429)
-    println(strResponse)
     parse(strResponse)
   }(executor = ExecutionContext.global)
 
