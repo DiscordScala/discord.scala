@@ -1,10 +1,9 @@
 package github.discordscala.core
 
 import github.discordscala.core.models.User
-import github.discordscala.core.util.{Patch, RequestUtil}
-import net.liftweb.json
-import spire.math.ULong
+import github.discordscala.core.util.{DiscordException, Patch, RequestUtil}
 import net.liftweb.json._
+import spire.math.ULong
 
 import scala.concurrent.Future
 
@@ -14,6 +13,9 @@ case class Client(token: String, gatewayURL: String = "wss://gateway.discord.gg/
   def ourUser = User(this)
   def user(id: ULong) = User(this, id)
 
-  def username_=(newUsername: String): Future[json.JValue] = RequestUtil.restRequestFuture(s"${apiURL}users/@me", Map("Authorization" -> token), Patch, Extraction.decompose(User(username = Some(newUsername))))
+  def username_=(newUsername: String): Future[Either[DiscordException, User]] = RequestUtil.restRequestFuture(s"${apiURL}users/@me", Map("Authorization" -> token), Patch, Extraction.decompose(User(username = Some(newUsername)))).map {
+    case Left(e) => Left(e)
+    case Right(j) => Right(j.extract[User])
+  }
 
 }

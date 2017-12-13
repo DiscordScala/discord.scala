@@ -18,9 +18,9 @@ object RequestUtil {
   implicit val system = ActorSystem("DiscordScalaHTTPRequests")
   implicit val materializer = ActorMaterializer()
 
-  def restRequestFuture(url: String, headers: Map[String, String], method: RequestMethod = Get, body: Option[(String, String)] = None): Future[JValue] = Future {
+  def restRequestFuture(url: String, headers: Map[String, String], method: RequestMethod = Get, body: Option[(String, String)] = None): Future[Either[DiscordException, JValue]] = Future {
     var status = 0
-    var strResponse: String = null
+    var eResponse: Either[DiscordException, String] = null
     do {
       val brequest = (method match {
         case Get => sttp.get(uri"$url")
@@ -38,24 +38,33 @@ object RequestUtil {
         val unRatelimitTime = response.header("X-RateLimit-Reset").get.toLong
         Thread.sleep(System.currentTimeMillis() - (unRatelimitTime * 1000 + 500))
       } else {
-        if(status / 100 != 2) {
-          throw new RuntimeException(s"Status $status") // FIXME create better error reporting for thi
+        if(status / 100 == 4 || status / 100 == 5) {
+          eResponse = Left(status match {
+            case 400 => BadRequest
+            case 401 => Unauthorized
+            case 403 => Forbidden
+            case 404 => NotFound
+            case 502 => BadRequest
+          })
         } else {
-          strResponse = response.body match {
+          eResponse = Right(response.body match {
             case Left(str) => str
             case Right(sor) => Await.result(sor.runFold("")((acc, ns) => acc + ns.foldLeft("")((s, b) => s + b.toChar.toString)), Duration.Inf)
-          }
+          })
         }
       }
     } while (status == 429)
-    parse(strResponse)
+    eResponse match {
+      case Left(e) => Left(e)
+      case Right(s) => Right(parse(s))
+    }
   }(executor = ExecutionContext.global)
 
-  def restRequestFuture(url: String, headers: Map[String, String], method: RequestMethod, body: JValue): Future[JValue] = restRequestFuture(url, headers, method, Some(("application/json", compactRender(body))))
+  def restRequestFuture(url: String, headers: Map[String, String], method: RequestMethod, body: JValue): Future[Either[DiscordException, JValue]] = restRequestFuture(url, headers, method, Some(("application/json", compactRender(body))))
 
-  def awaitRestRequestFuture(url: String, headers: Map[String, String], method: RequestMethod = Get, body: Option[(String, String)] = None, timeout: Duration = Duration.Inf): JValue = Await.result(restRequestFuture(url, headers), timeout)
+  def awaitRestRequestFuture(url: String, headers: Map[String, String], method: RequestMethod = Get, body: Option[(String, String)] = None, timeout: Duration = Duration.Inf): Either[DiscordException, JValue] = Await.result(restRequestFuture(url, headers), timeout)
 
-  def awaitRestRequestFuture(url: String, headers: Map[String, String], method: RequestMethod, body: JValue, timeout: Duration): JValue = awaitRestRequestFuture(url, headers, method, Some(("application/json", compactRender(body))), timeout)
+  def awaitRestRequestFuture(url: String, headers: Map[String, String], method: RequestMethod, body: JValue, timeout: Duration): Either[DiscordException, JValue] = awaitRestRequestFuture(url, headers, method, Some(("application/json", compactRender(body))), timeout)
 
 }
 
@@ -63,3 +72,10 @@ sealed trait RequestMethod
 case object Get extends RequestMethod
 case object Post extends RequestMethod
 case object Patch extends RequestMethod
+
+sealed trait DiscordException
+case object BadRequest extends DiscordException
+case object Unauthorized extends DiscordException
+case object Forbidden extends DiscordException
+case object NotFound extends DiscordException
+case object GatewayUnavailable extends DiscordException

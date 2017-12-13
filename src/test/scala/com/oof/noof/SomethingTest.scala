@@ -8,6 +8,6 @@ import scala.concurrent.duration.Duration
 object SomethingTest extends App {
 
   val c = Client("Bot MzMwOTExNTkxOTIxMDkwNTYw.DRIhqA.lQVlTGjgxe4WqycWFwpUvGqmvN4")
-  println(Await.result(c.username_=("oof"), Duration.Inf))
+  println(Await.result(c.username_=("dabonthehaters"), Duration.Inf))
 
 }
