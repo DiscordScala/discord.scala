@@ -4,6 +4,6 @@ import spire.math.ULong
 
 trait Snowflaked {
 
-  val id: ULong
+  val id: Option[ULong]
 
 }

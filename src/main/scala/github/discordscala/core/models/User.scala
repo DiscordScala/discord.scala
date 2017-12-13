@@ -4,9 +4,9 @@ import github.discordscala.core.Client
 import github.discordscala.core.util.RequestUtil
 import spire.math.ULong
 
-import github.discordscala.core.DiscordScala._
+import github.discordscala.core._
 
-case class User(id: ULong, username: String, discriminator: String, avatar: String, bot: Option[Boolean], mfa: Option[Boolean], verified: Option[Boolean], email: Option[String]) extends Snowflaked
+case class User(id: Option[ULong] = None, username: Option[String] = None, discriminator: Option[String] = None, avatar: Option[String] = None, bot: Option[Boolean] = None, mfa: Option[Boolean] = None, verified: Option[Boolean] = None, email: Option[String] = None) extends Snowflaked
 object User {
 
   def apply(c: Client, id: ULong): User = RequestUtil.awaitRestRequestFuture(c.apiURL + s"users/$id", Map("Authorization" -> c.token)).extract[User]
