@@ -57,9 +57,9 @@ class WebsocketListener(c: Client, chooseShard: Option[Int] = None)(implicit sha
     val jast = parse(js)
     jast \ "op" match {
       case JInt(b) if b == BigInt(0) => jast \ "t" match {
-        case JString(e) => opZeroMap(e).apply(jast \ "d")
+        case JString(e) => opZeroMap(e).apply(jast \ "d", c, this)
       }
-      case JInt(b) => opNonZeroMap(b.toInt).apply(jast \ "d")
+      case JInt(b) => opNonZeroMap(b.toInt).apply(jast \ "d", c, this)
     }
   }
 

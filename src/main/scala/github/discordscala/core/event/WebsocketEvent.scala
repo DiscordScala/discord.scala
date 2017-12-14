@@ -1,5 +1,6 @@
 package github.discordscala.core.event
 
+import github.discordscala.core.Client
 import net.liftweb.json.JsonAST.JValue
 
 /**
@@ -12,10 +13,12 @@ trait WebsocketEventBase[E <: WebsocketEvent] {
   /**
     * Creates an event from the parsed JSON payload
     *
-    * @param v JSON Payload
+    * @param v JSON Payload at `d`
+    * @param c Client
+    * @param w Websocket Listener
     * @return Websocket Event
     */
-  def apply(v: JValue): E
+  def apply(v: JValue, c: Client, w: WebsocketListener): E
 
   /**
     *
