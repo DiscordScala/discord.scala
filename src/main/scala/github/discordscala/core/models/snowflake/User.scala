@@ -10,7 +10,7 @@ import spire.math.ULong
   * @param id            ID of the user
   * @param username      Name of the user
   * @param discriminator Discriminator of the user (eg if full name is ABC#1234, 1234 is the discriminator)
-  * @param avatar        URL to the users Avatar
+  * @param avatar        Hash of the users Avatar
   * @param bot           Whether or not the user is a bot
   * @param mfa           Whether or not 2fa is enabled (Only available to self user)
   * @param verified      Whether or not the email is verified (Only available to self user)

@@ -19,10 +19,13 @@ package object core {
     * Start of the Discord Epoch
     */
   val discordEpoch = ULong(1420070400000l)
+
   /**
     * Standard Discord.Scala Useragent
     */
-  val userAgent: (String, String) = "User-Agent" -> "discord.scala/0.1"
+  val userAgentName: String = "discord.scala"
+  val userAgentVersion: String = "0.1"
+
   implicit val executor: ExecutionContextExecutor = ExecutionContext.global
   implicit val backend: SttpBackend[Future, Source[ByteString, Any]] = AkkaHttpBackend()
   implicit val formats: Formats = DefaultFormats + SnowflakeSerializer + USnowflakeSerializer
