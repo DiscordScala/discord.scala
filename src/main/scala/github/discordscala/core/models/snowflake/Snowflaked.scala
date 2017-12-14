@@ -1,4 +1,4 @@
-package github.discordscala.core.models
+package github.discordscala.core.models.snowflake
 
 import spire.math.ULong
 

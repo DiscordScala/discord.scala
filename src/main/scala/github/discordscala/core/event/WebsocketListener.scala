@@ -15,6 +15,7 @@ import net.liftweb.json._
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.concurrent.Future
+import scala.math.BigInt
 
 class WebsocketListener(c: Client, chooseShard: Option[Int] = None)(implicit sharding: Sharding) {
 
@@ -34,25 +35,32 @@ class WebsocketListener(c: Client, chooseShard: Option[Int] = None)(implicit sha
   lazy val messageSource: Source[Message, ActorRef] = Source.actorRef[TextMessage.Strict](bufferSize = 1000, OverflowStrategy.fail)
   lazy val messageSink: Sink[Message, NotUsed] = Flow[Message].map(handleGateway).to(Sink.ignore)
 
-  def startRequest: ((ActorRef, (Future[WebSocketUpgradeResponse], UniqueKillSwitch)), NotUsed) = {
+  def startRequest: (ActorRef, (Future[WebSocketUpgradeResponse], UniqueKillSwitch)) = {
     val r = Http().webSocketClientFlow(req)
-    messageSource.viaMat(r.viaMat(KillSwitches.single)(Keep.both))(Keep.both).toMat(messageSink)(Keep.both).run()
+    messageSource.viaMat(r.viaMat(KillSwitches.single)(Keep.both))(Keep.both).toMat(messageSink)(Keep.left).run()
   }
 
-  var currentRequest: ((ActorRef, (Future[WebSocketUpgradeResponse], UniqueKillSwitch)), NotUsed) = _
+  var currentRequest: (ActorRef, (Future[WebSocketUpgradeResponse], UniqueKillSwitch)) = _
 
   def start(): Unit = {
     currentRequest = startRequest
-    currentRequest._1._1.identify()
+    currentRequest._1.identify()
   }
 
   def stop(): Unit = {
-    currentRequest._1._2._2.shutdown()
+    currentRequest._2._2.shutdown()
     currentRequest = null
   }
 
   def handleGateway(m: Message): Unit = {
-
+    val js = m.asTextMessage.getStrictText
+    val jast = parse(js)
+    jast \ "op" match {
+      case JInt(b) if b == BigInt(0) => jast \ "t" match {
+        case JString(e) => opZeroMap(e).apply(jast \ "d")
+      }
+      case JInt(b) => opNonZeroMap(b.toInt).apply(jast \ "d")
+    }
   }
 
   implicit class GatewayWebsocket(ar: ActorRef) {
@@ -73,7 +81,7 @@ case class Sharding(max_shards: Int) {
 
   def addListener(l: WebsocketListener): Unit = {
     val m = (myListenerShards + (-1 -> null)).maxBy(_._1)._1
-    if(m >= max_shards) throw new OutOfShardsException
+    if (m >= max_shards) throw new OutOfShardsException
     myListenerShards += (m + 1 -> l)
   }
 

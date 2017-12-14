@@ -1,9 +1,8 @@
-package github.discordscala.core.models
+package github.discordscala.core.models.snowflake
 
-import github.discordscala.core.Client
+import github.discordscala.core.{Client, _}
 import github.discordscala.core.util.{DiscordException, RequestUtil}
 import spire.math.ULong
-import github.discordscala.core._
 
 case class User(id: Option[ULong] = None, username: Option[String] = None, discriminator: Option[String] = None, avatar: Option[String] = None, bot: Option[Boolean] = None, mfa: Option[Boolean] = None, verified: Option[Boolean] = None, email: Option[String] = None) extends Snowflaked
 object User {
