@@ -12,7 +12,7 @@ object SomethingTest {
     implicit val sharding: Sharding = Sharding(1)
     val c = Client("Bot MzMwOTExNTkxOTIxMDkwNTYw.DRIhqA.lQVlTGjgxe4WqycWFwpUvGqmvN4", myShards = Set(0))
     c.login()
-    println(Await.result(c.username_=("dabonthehaters"), Duration.Inf))
+    println(Await.result(c.username_=("Discord.Scala"), Duration.Inf))
   }
 
 }
