@@ -9,9 +9,9 @@ import spire.math.ULong
 import scala.concurrent.Future
 
 // TODO
-case class Client(token: String, gatewayURL: String = "wss://gateway.discord.gg/", apiURL: String = "https://discordapp.com/api/v6/")(implicit s: Sharding) {
+case class Client(token: String, gatewayURL: String = "wss://gateway.discord.gg/", apiURL: String = "https://discordapp.com/api/v6/", myShards: Set[Int])(implicit sharding: Sharding) {
 
-  lazy val shards: Seq[WebsocketListener] = (0 until s.max_shards).map((sc) => new WebsocketListener(this, Some(sc)))
+  lazy val shards: Set[WebsocketListener] = myShards.map((sc) => new WebsocketListener(this, Some(sc)))
 
   def ourUser = User(this)
   def user(id: ULong) = User(this, id)

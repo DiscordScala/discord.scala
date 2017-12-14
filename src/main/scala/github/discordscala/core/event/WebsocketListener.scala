@@ -6,9 +6,9 @@ import akka.NotUsed
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.ws.{Message, TextMessage, WebSocketRequest, WebSocketUpgradeResponse}
-import akka.stream.{KillSwitches, OverflowStrategy, UniqueKillSwitch}
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
-import github.discordscala.core.Client
+import akka.stream.{Client => _, _}
+import github.discordscala.core._
 import github.discordscala.core.event.payload.{GatewayIdentificationData, IdentifyPayload}
 import net.liftweb.json._
 
@@ -16,14 +16,17 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.concurrent.Future
 
-class WebsocketListener(c: Client, chooseShard: Option[Int] = None)(implicit s: Sharding) {
+class WebsocketListener(c: Client, chooseShard: Option[Int] = None)(implicit sharding: Sharding) {
+
+  implicit val system: ActorSystem = ActorSystem("WebsocketListenerSystem")
+  implicit val materializer: Materializer = ActorMaterializer()
 
   lazy val opZeroMap: Map[String, WebsocketEventBase[_ <: WebsocketEvent]] = ServiceLoader.load(classOf[WebsocketEventBase[_ <: WebsocketEvent]]).asScala.filter(_.eventName.isDefined).map((e) => (e.eventName.get, e)).toMap
   lazy val opNonZeroMap: Map[Int, WebsocketEventBase[_ <: WebsocketEvent]] = ServiceLoader.load(classOf[WebsocketEventBase[_ <: WebsocketEvent]]).asScala.filter(_.eventOp != 0).map((e) => (e.eventOp, e)).toMap
 
   chooseShard match {
-    case Some(shardChose) => s.myListenerShards += (shardChose -> this)
-    case None => s.addListener(this)
+    case Some(shardChose) => sharding.myListenerShards += (shardChose -> this)
+    case None => sharding.addListener(this)
   }
 
   lazy val req = WebSocketRequest(c.gatewayURL)
@@ -55,7 +58,7 @@ class WebsocketListener(c: Client, chooseShard: Option[Int] = None)(implicit s: 
   implicit class GatewayWebsocket(ar: ActorRef) {
 
     def identify(): Future[Unit] = Future {
-      ar ! Extraction.decompose(IdentifyPayload(GatewayIdentificationData(c.token, shard = Array(s.myListenerShards.find(_._2 == WebsocketListener.this).get._1, s.max_shards))))
+      ar ! Extraction.decompose(IdentifyPayload(GatewayIdentificationData(c.token, shard = Array(sharding.myListenerShards.find(_._2 == WebsocketListener.this).get._1, sharding.max_shards))))
     }
 
   }
