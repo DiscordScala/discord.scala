@@ -24,7 +24,7 @@ package object core {
     * Standard Discord.Scala Useragent
     */
   val userAgentName: String = "discord.scala"
-  val userAgentVersion: String = "0.1"
+  val userAgentVersion: String = "0.1.0"
 
   implicit val executor: ExecutionContextExecutor = ExecutionContext.global
   implicit val backend: SttpBackend[Future, Source[ByteString, Any]] = AkkaHttpBackend()
