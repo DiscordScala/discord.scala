@@ -58,7 +58,7 @@ class WebsocketListener(c: Client, chooseShard: Option[Int] = None)(implicit sha
   implicit class GatewayWebsocket(ar: ActorRef) {
 
     def identify(): Future[Unit] = Future {
-      ar ! Extraction.decompose(IdentifyPayload(GatewayIdentificationData(c.token, shard = Array(sharding.myListenerShards.find(_._2 == WebsocketListener.this).get._1, sharding.max_shards))))
+      ar ! TextMessage(compactRender(Extraction.decompose(IdentifyPayload(GatewayIdentificationData(c.token, shard = Array(sharding.myListenerShards.find(_._2 == WebsocketListener.this).get._1, sharding.max_shards))))))
     }
 
   }
