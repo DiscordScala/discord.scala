@@ -7,7 +7,7 @@ import akka.util.ByteString
 import com.softwaremill.sttp.SttpBackend
 import com.softwaremill.sttp.akkahttp.AkkaHttpBackend
 import github.discordscala.core.models.Snowflaked
-import github.discordscala.core.serializers.SnowflakeSerializer
+import github.discordscala.core.serializers.{SnowflakeSerializer, USnowflakeSerializer}
 import net.liftweb.json.{DefaultFormats, Formats}
 import spire.math.ULong
 
@@ -19,7 +19,7 @@ package object core {
   val userAgent: (String, String) = "User-Agent" -> "discord.scala/0.1"
   implicit val executor: ExecutionContextExecutor = ExecutionContext.global
   implicit val backend: SttpBackend[Future, Source[ByteString, Any]] =  AkkaHttpBackend()
-  implicit val formats: Formats = DefaultFormats + SnowflakeSerializer
+  implicit val formats: Formats = DefaultFormats + SnowflakeSerializer + USnowflakeSerializer
 
   implicit class SnowflakeUtil(s: Snowflaked) {
 

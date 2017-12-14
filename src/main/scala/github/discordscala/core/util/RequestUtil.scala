@@ -26,7 +26,7 @@ object RequestUtil {
         case Get => sttp.get(uri"$url")
         case Post => sttp.post(uri"$url")
         case Patch => sttp.patch(uri"$url")
-      }).headers(headers)
+      }).headers(headers + userAgent)
       val request = (body match {
         case Some((mime, content)) => brequest.contentType(mime, "UTF-8").streamBody(Source.single(ByteString(content, "UTF-8")))
         case None => brequest
