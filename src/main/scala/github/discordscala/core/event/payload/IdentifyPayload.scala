@@ -8,4 +8,4 @@ case class IdentifyPayload(id: GatewayIdentificationData) extends GatewayPayload
 
 case class GatewayIdentificationData(token: String, properties: GatewayIdentificationProperties = GatewayIdentificationProperties(), compress: Boolean = false, large_threshold: Int = 100, shard: Array[Int] = Array(0, 1), presence: Option[Presence] = None)
 
-case class GatewayIdentificationProperties($os: String = System.getProperty("os.name"), $browser: String = "Discord.Scala", device: String = "Discord.Scala")
+case class GatewayIdentificationProperties($os: String = System.getProperty("os.name"), $browser: String = "discord.scala", device: String = "discord.scala")
