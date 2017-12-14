@@ -1,4 +1,5 @@
-<img align="right" width="128" height="128" src="https://user-images.githubusercontent.com/3067335/29408337-6e1314b4-830d-11e7-9e2c-49bf8a1ee970.png">
+<img align="right" width="256" height="256" src="https://github.com/DiscordScala/discord.scala/raw/master/assets/DiscordScala.png">
 
 # Discord.Scala
 
+Discord.Scala is a Scala wrapper for Discord's API focused on usability and readability.
