@@ -1,6 +1,6 @@
 package github.discordscala.core
 
-import github.discordscala.core.event.{Sharding, WebsocketListener}
+import github.discordscala.core.event.Sharding
 import github.discordscala.core.models.snowflake.User
 import github.discordscala.core.util.{DiscordException, Patch, RequestUtil}
 import net.liftweb.json._
@@ -16,15 +16,15 @@ import scala.concurrent.Future
   * @param token      Token of the Client (prefix with Bot if necessary)
   * @param gatewayURL URL of the discord-compatible Gateway (e.g. Discord or Litecord)
   * @param apiURL     URL under which the API can be found
-  * @param myShards   Set of ID of shards
-  * @param sharding   ??
+  * @param myShards   The shards that this specific client has control over. Multiple clients may be on different servers and control different shards
+  * @param sharding   Shard specification for this client
   */
 case class Client(token: String, gatewayURL: String = "wss://gateway.discord.gg/", apiURL: String = "https://discordapp.com/api/v6/", myShards: Set[Int])(implicit sharding: Sharding) {
 
   /**
     * List of Listeners per Shard
     */
-  lazy val shards: Set[WebsocketListener] = myShards.map((sc) => new WebsocketListener(this, Some(sc)))
+  lazy val shards: Map[Int, Shard] = myShards.map((sc) => sc -> Shard(this, sc)).toMap
 
   /**
     * Access the user the client logged in as
@@ -42,6 +42,8 @@ case class Client(token: String, gatewayURL: String = "wss://gateway.discord.gg/
     */
   def user(id: ULong) = User(this, id)
 
+  def guild(id: ULong) = Guild(this, id)
+
   /**
     * Changes the username of the user logged in
     *
@@ -57,14 +59,14 @@ case class Client(token: String, gatewayURL: String = "wss://gateway.discord.gg/
     * Login to the gateway
     */
   def login(): Unit = {
-    shards.foreach(_.start())
+    shards.values.foreach(_.start())
   }
 
   /**
     * Logout of the gateway
     */
   def logout(): Unit = {
-    shards.foreach(_.stop())
+    shards.values.foreach(_.stop())
   }
 
 }

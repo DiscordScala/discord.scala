@@ -17,7 +17,7 @@ import scala.collection.mutable
 import scala.concurrent.Future
 import scala.math.BigInt
 
-class WebsocketListener(c: Client, chooseShard: Option[Int] = None)(implicit sharding: Sharding) {
+class WebsocketListener(c: Client, shard: Shard)(implicit sharding: Sharding) {
 
   implicit val system: ActorSystem = ActorSystem("WebsocketListenerSystem")
   implicit val materializer: Materializer = ActorMaterializer()
@@ -25,10 +25,7 @@ class WebsocketListener(c: Client, chooseShard: Option[Int] = None)(implicit sha
   lazy val opZeroMap: Map[String, WebsocketEventBase[_ <: WebsocketEvent]] = ServiceLoader.load(classOf[WebsocketEventBase[_ <: WebsocketEvent]]).asScala.filter(_.eventName.isDefined).map((e) => (e.eventName.get, e)).toMap
   lazy val opNonZeroMap: Map[Int, WebsocketEventBase[_ <: WebsocketEvent]] = ServiceLoader.load(classOf[WebsocketEventBase[_ <: WebsocketEvent]]).asScala.filter(_.eventOp != 0).map((e) => (e.eventOp, e)).toMap
 
-  chooseShard match {
-    case Some(shardChose) => sharding.myListenerShards += (shardChose -> this)
-    case None => sharding.addListener(this)
-  }
+  sharding.myListenerShards += (shard.shardNumber -> this)
 
   lazy val req = WebSocketRequest(c.gatewayURL)
 

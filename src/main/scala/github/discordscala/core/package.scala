@@ -49,4 +49,6 @@ package object core {
 
   }
 
+  implicit def uLongToSnowflaked(l: ULong): Snowflaked = new Snowflaked { override val id: Option[ULong] = Some(l) }
+
 }
