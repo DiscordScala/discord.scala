@@ -1,7 +1,7 @@
 package github.discordscala.core
 
 import github.discordscala.core.event.Sharding
-import github.discordscala.core.models.snowflake.User
+import github.discordscala.core.models.snowflake.{Guild, User}
 import github.discordscala.core.util.{DiscordException, Patch, RequestUtil}
 import net.liftweb.json._
 import spire.math.ULong

@@ -2,7 +2,9 @@ package github.discordscala.core.models.snowflake
 
 import java.time.Instant
 
+import github.discordscala.core._
 import github.discordscala.core.models.Presence
+import github.discordscala.core.util.{DiscordException, RequestUtil}
 import net.liftweb.json.JsonAST.JValue
 import spire.math.ULong
 
@@ -39,5 +41,14 @@ class Guild(
              channels: Option[Array[JValue]] = None, // TODO implement channel
              presences: Option[Array[Presence]] = None,
            ) {
+
+}
+
+object Guild {
+
+  def apply(c: Client, id: ULong): Either[DiscordException, Guild] = RequestUtil.awaitRestRequestFuture(c.apiURL + s"guilds/$id", Map("Authorization" -> c.token)) match {
+    case Left(e) => Left(e)
+    case Right(j) => Right(j.extract[Guild])
+  }
 
 }
