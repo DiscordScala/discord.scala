@@ -5,6 +5,8 @@ import java.time.Instant
 import github.discordscala.core._
 import github.discordscala.core.models.Presence
 import github.discordscala.core.util.{DiscordException, RequestUtil}
+import net.liftweb.json.FieldSerializer
+import net.liftweb.json.FieldSerializer._
 import net.liftweb.json.JsonAST.JValue
 import spire.math.ULong
 
@@ -14,12 +16,12 @@ class Guild(
              icon: Option[String] = None,
              splash: Option[String] = None,
              owner: Option[Boolean] = None,
-             owner_id: Option[ULong] = None,
+             ownerId: Option[ULong] = None,
              permissions: Option[Int] = None, // TODO Make a sealed permissions trait and case objects with a custom serializer
              region: Option[String] = None, // TODO Make a sealed region trait and case objects with a custom serializer
-             afk_channel_id: Option[ULong] = None,
-             afk_timeout: Option[Int] = None,
-             embed_enabled: Option[Boolean] = None,
+             afkChannelId: Option[ULong] = None,
+             afkTimeout: Option[Int] = None,
+             embedEnabled: Option[Boolean] = None,
              embed_channel_id: Option[ULong] = None,
              verification_level: Option[Int] = None, // TODO Make a sealed verification level trait and case objects with a custom serializer
              default_message_notifications: Option[Int] = None, // TODO ^ ditto
@@ -45,6 +47,20 @@ class Guild(
 }
 
 object Guild {
+
+  val fieldSerializers: List[FieldSerializer[Guild]] = FieldSerializer[Guild](
+    renameTo("ownerId", "owner_id"),
+    renameFrom("owner_id", "ownerId")
+  ) :: FieldSerializer[Guild](
+    renameTo("afkChannelId", "afk_channel_id"),
+    renameFrom("afk_channel_id", "afkChannelId")
+  ) :: FieldSerializer[Guild](
+    renameTo("afkTimeout", "afk_timeout"),
+    renameFrom("afk_timeout", "afkTimeout")
+  ) :: FieldSerializer[Guild](
+    renameTo("embedEnabled", "embed_enabled"),
+    renameFrom("embed_enabled", "embedEnabled")
+  ) :: Nil
 
   def apply(c: Client, id: ULong): Either[DiscordException, Guild] = RequestUtil.awaitRestRequestFuture(c.apiURL + s"guilds/$id", Map("Authorization" -> c.token)) match {
     case Left(e) => Left(e)
