@@ -12,11 +12,15 @@ import net.liftweb.json.JsonAST.JValue
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.Duration
+import scala.util.matching.Regex
 
 /**
   * Object that does the heavy lifting for API requests
   */
 object RequestUtil {
+
+  val keyCorrectionReg: Regex = """_([a-z])""".r
+  val keyDeCorrectionReg: Regex = """([A-Z])""".r
 
   implicit val system = ActorSystem("DiscordScalaHTTPRequests")
   implicit val materializer = ActorMaterializer()
@@ -30,7 +34,9 @@ object RequestUtil {
     * @param body    JSON representation of the body
     * @return Future of the request
     */
-  def restRequestFuture(url: String, headers: Map[String, String], method: RequestMethod, body: JValue): Future[Either[DiscordException, JValue]] = restRequestFuture(url, headers, method, Some(("application/json", compactRender(body))))
+  def restRequestFuture(url: String, headers: Map[String, String], method: RequestMethod, body: JValue): Future[Either[DiscordException, JValue]] = restRequestFuture(url, headers, method, Some(("application/json", compactRender(body transformField {
+    case JField(key, value) => JField(keyDeCorrectionReg.replaceAllIn(key, (m) => s"_${m.matched.toLowerCase}"), value)
+  }))))
 
   /**
     * Like restRequestFuture, but waits for the result
@@ -42,7 +48,9 @@ object RequestUtil {
     * @param timeout How long to wait for an Answer
     * @return Either a Discord Exception or the response
     */
-  def awaitRestRequestFuture(url: String, headers: Map[String, String], method: RequestMethod, body: JValue, timeout: Duration): Either[DiscordException, JValue] = awaitRestRequestFuture(url, headers, method, Some(("application/json", compactRender(body))), timeout)
+  def awaitRestRequestFuture(url: String, headers: Map[String, String], method: RequestMethod, body: JValue, timeout: Duration): Either[DiscordException, JValue] = awaitRestRequestFuture(url, headers, method, Some(("application/json", compactRender(body transformField {
+    case JField(key, value) => JField(keyDeCorrectionReg.replaceAllIn(key, (m) => s"_${m.matched.toLowerCase}"), value)
+  }))), timeout)
 
   /**
     * Like restRequestFuture, but waits for the result
@@ -103,7 +111,9 @@ object RequestUtil {
     } while (status == 429)
     eResponse match {
       case Left(e) => Left(e)
-      case Right(s) => Right(parse(s))
+      case Right(s) => Right(parse(s) transformField {
+        case JField(key, value) => JField(keyCorrectionReg.replaceAllIn(key, (m) => m.group(1).toUpperCase), value)
+      })
     }
   }(executor = ExecutionContext.global)
 

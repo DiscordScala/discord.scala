@@ -16,7 +16,15 @@ import spire.math.ULong
   * @param verified      Whether or not the email is verified (Only available to self user)
   * @param email         Email of the user (Only available to self user)
   */
-case class User(id: Option[ULong] = None, username: Option[String] = None, discriminator: Option[String] = None, avatar: Option[String] = None, bot: Option[Boolean] = None, mfa: Option[Boolean] = None, verified: Option[Boolean] = None, email: Option[String] = None) extends Snowflaked
+case class User(
+                 id: Option[ULong] = None,
+                 username: Option[String] = None,
+                 discriminator: Option[String] = None,
+                 avatar: Option[String] = None,
+                 bot: Option[Boolean] = None,
+                 mfa: Option[Boolean] = None,
+                 verified: Option[Boolean] = None,
+                 email: Option[String] = None) extends Snowflaked
 
 object User {
 

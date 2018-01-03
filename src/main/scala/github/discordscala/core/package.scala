@@ -6,9 +6,9 @@ import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import com.softwaremill.sttp.SttpBackend
 import com.softwaremill.sttp.akkahttp.AkkaHttpBackend
-import github.discordscala.core.models.snowflake.{Guild, Snowflaked}
+import github.discordscala.core.models.snowflake.Snowflaked
 import github.discordscala.core.serializers.{SnowflakeSerializer, USnowflakeSerializer}
-import net.liftweb.json.{DefaultFormats, FieldSerializer, Formats}
+import net.liftweb.json._
 import spire.math.ULong
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
@@ -28,17 +28,7 @@ package object core {
 
   implicit val executor: ExecutionContextExecutor = ExecutionContext.global
   implicit val backend: SttpBackend[Future, Source[ByteString, Any]] = AkkaHttpBackend()
-  implicit val formats: Formats = DefaultFormats + SnowflakeSerializer + USnowflakeSerializer ++ Guild.fieldSerializers
-
-  implicit class FormatsHack(f: Formats) {
-
-    def ++(a: Traversable[FieldSerializer[_]]): Formats = {
-      var tf = f
-      a.foreach((nf) => tf = tf + nf)
-      tf
-    }
-
-  }
+  implicit val formats: Formats = DefaultFormats + SnowflakeSerializer + USnowflakeSerializer
 
   implicit class SnowflakeUtil(s: Snowflaked) {
 
