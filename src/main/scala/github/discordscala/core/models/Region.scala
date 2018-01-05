@@ -102,4 +102,28 @@ object Region {
     val vip = false
   }
 
+  //FIXME lazy vals pulling regions from api
+
+  def apply(id: String): Region = {
+    case "eu-central" => EuropeCentral
+    case "eu-west" => EuropeWest
+    case "japan" => Japan
+    case "brazil" => Brazil
+    case "hongkong" => HongKong
+    case "sydney" => Sydney
+    case "singapore" => Singapore
+    case "us-central" => UnitedStatesCentral
+    case "us-west" => UnitedStatesWest
+    case "us-east" => UnitedStatesEast
+    case "us-south" => UnitedStatesSouth
+    case "russia" => Russia
+    case "vip-amsterdam" => VipAmsterdam
+    case "vip-us-west" => VipUnitedStatesWest
+    case "vip-us-east" => VipUnitedStatesEast
+    case "amsterdam" => Amsterdam
+    case "frankfurt" => Frankfurt
+    case "london" => London
+    case _ => throw new IllegalArgumentException(s"$id is not a valid region.")
+  }
+
 }
