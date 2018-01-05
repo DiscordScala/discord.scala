@@ -104,7 +104,7 @@ object Region {
 
   //FIXME lazy vals pulling regions from api
 
-  def apply(id: String): Region = {
+  def apply(id: String): Region = id match {
     case "eu-central" => EuropeCentral
     case "eu-west" => EuropeWest
     case "japan" => Japan

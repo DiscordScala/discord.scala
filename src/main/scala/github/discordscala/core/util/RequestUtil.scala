@@ -153,3 +153,5 @@ case object Forbidden extends DiscordException
 case object NotFound extends DiscordException
 
 case object GatewayUnavailable extends DiscordException
+
+case object CombinedOrUnknown extends DiscordException

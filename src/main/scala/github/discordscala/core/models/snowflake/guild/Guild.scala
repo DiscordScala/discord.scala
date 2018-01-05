@@ -1,8 +1,9 @@
-package github.discordscala.core.models.snowflake
+package github.discordscala.core.models.snowflake.guild
 
 import java.time.Instant
 
 import github.discordscala.core._
+import github.discordscala.core.models.snowflake.{Snowflaked, User}
 import github.discordscala.core.models.{Presence, Region}
 import github.discordscala.core.util.{DiscordException, RequestUtil}
 import net.liftweb.json.JsonAST.JValue
@@ -16,7 +17,7 @@ case class Guild(
                   owner: Option[Boolean] = None,
                   ownerId: Option[ULong] = None,
                   permissions: Option[Int] = None, // TODO Make a sealed permissions trait and case objects with a custom serializer
-                  region: Option[Region] = None, 
+                  region: Option[Region] = None,
                   afkChannelId: Option[ULong] = None,
                   afkTimeout: Option[Int] = None,
                   embedEnabled: Option[Boolean] = None,
@@ -24,7 +25,7 @@ case class Guild(
                   verificationLevel: Option[Int] = None, // TODO Make a sealed verification level trait and case objects with a custom serializer
                   defaultMessageNotifications: Option[Int] = None, // TODO ^ ditto
                   explicitContentFilter: Option[Int] = None, // TODO Sealed trait, case object, blah blah
-                  roles: Option[Array[JValue]] = None, // TODO implement role
+                  roles: Option[Array[Role]] = None,
                   emojis: Option[Array[JValue]] = None, // TODO implement emoji
                   features: Option[Array[String]] = None, // TODO help im stuck in a "make a comment about case objects" factory
                   mfaLevel: Option[Int] = None, // TODO same here im also forced to do this "case object sealed trait" thing
@@ -40,13 +41,13 @@ case class Guild(
                   members: Option[Array[User]] = None, // TODO make User associated with guild by having partial Member values
                   channels: Option[Array[JValue]] = None, // TODO implement channel
                   presences: Option[Array[Presence]] = None,
-           ) extends Snowflaked {
+           )(implicit client: Client) extends Snowflaked {
 
 }
 
 object Guild {
 
-  def apply(c: Client, id: ULong): Either[DiscordException, Guild] = RequestUtil.awaitRestRequestFuture(c.apiURL + s"guilds/$id", Map("Authorization" -> c.token)) match {
+  def apply(id: ULong)(implicit client: Client): Either[DiscordException, Guild] = RequestUtil.awaitRestRequestFuture(client.apiURL + s"guilds/$id", Map("Authorization" -> client.token)) match {
     case Left(e) => Left(e)
     case Right(j) => Right(j.extract[Guild])
   }

@@ -24,11 +24,11 @@ case class User(
                  bot: Option[Boolean] = None,
                  mfa: Option[Boolean] = None,
                  verified: Option[Boolean] = None,
-                 email: Option[String] = None) extends Snowflaked
+                 email: Option[String] = None)(implicit client: Client) extends Snowflaked
 
 object User {
 
-  def apply(c: Client, id: ULong): Either[DiscordException, User] = RequestUtil.awaitRestRequestFuture(c.apiURL + s"users/$id", Map("Authorization" -> c.token)) match {
+  def apply(id: ULong)(implicit client: Client): Either[DiscordException, User] = RequestUtil.awaitRestRequestFuture(client.apiURL + s"users/$id", Map("Authorization" -> client.token)) match {
     case Left(e) => Left(e)
     case Right(j) => Right(j.extract[User])
   }

@@ -2,6 +2,7 @@ package github.discordscala.core.models.snowflake
 
 import java.time.Instant
 
+import github.discordscala.core.Client
 import net.liftweb.json.JsonAST.JValue
 import spire.math.ULong
 
@@ -44,6 +45,6 @@ case class Message( // TODO convert JValues into their respective objects
                     pinned: Option[Boolean] = None,
                     webhookId: Option[Boolean] = None,
                     `type`: Option[Int] = None
-                  ) extends Snowflaked {
+                  )(implicit client: Client) extends Snowflaked {
 
 }

@@ -1,8 +1,9 @@
 package github.discordscala.core
 
 import github.discordscala.core.event.Sharding
-import github.discordscala.core.models.snowflake.{Guild, User}
-import github.discordscala.core.util.{DiscordException, Patch, RequestUtil}
+import github.discordscala.core.models.snowflake.User
+import github.discordscala.core.models.snowflake.guild.Guild
+import github.discordscala.core.util.{DiscordException, Get, Patch, RequestUtil}
 import net.liftweb.json._
 import spire.math.ULong
 
@@ -20,6 +21,8 @@ import scala.concurrent.Future
   * @param sharding   Shard specification for this client
   */
 case class Client(token: String, gatewayURL: String = "wss://gateway.discord.gg/", apiURL: String = "https://discordapp.com/api/v6/", myShards: Set[Int])(implicit sharding: Sharding) {
+
+  implicit val client: Client = this
 
   /**
     * List of Listeners per Shard
@@ -40,9 +43,16 @@ case class Client(token: String, gatewayURL: String = "wss://gateway.discord.gg/
     * @param id ID of the user to get
     * @return User with that ID
     */
-  def user(id: ULong) = User(this, id)
+  def user(id: ULong) = Future { User(id) }
 
-  def guild(id: ULong) = Guild(this, id)
+  def guild(id: ULong) = Future { Guild(id) }
+
+  def guilds: Future[Either[DiscordException, Array[Guild]]] = Future {
+    RequestUtil.awaitRestRequestFuture(apiURL + "guilds", headers = Map("Authorization" -> token), Get) match {
+      case Left(e) => Left(e)
+      case Right(j) => Right(j.extract[Array[Guild]])
+    }
+  }
 
   /**
     * Changes the username of the user logged in
