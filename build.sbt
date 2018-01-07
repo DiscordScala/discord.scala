@@ -12,5 +12,6 @@ lazy val root = (project in file("."))
       "org.typelevel" %% "spire" % "0.14.1",
       "com.softwaremill.sttp" %% "core" % "1.1.2",
       "com.softwaremill.sttp" %% "akka-http-backend" % "1.1.2",
+      "org.clapper" %% "classutil" % "1.2.0"
     )
   )

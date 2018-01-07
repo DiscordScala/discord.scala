@@ -10,6 +10,8 @@ import net.liftweb.json.JsonAST.JValue
   */
 trait WebsocketEventBase[E <: WebsocketEvent] {
 
+  type Event = E
+
   /**
     * Creates an event from the parsed JSON payload
     *
@@ -18,7 +20,7 @@ trait WebsocketEventBase[E <: WebsocketEvent] {
     * @param w Websocket Listener
     * @return Websocket Event
     */
-  def apply(v: JValue, c: Client, w: WebsocketListener): E
+  def apply(v: JValue, c: Client, w: WebsocketListener): Event
 
   /**
     *
@@ -39,6 +41,8 @@ trait WebsocketEventBase[E <: WebsocketEvent] {
   * All variables are named accordingly to the Discord Gateway documentation.
   */
 trait WebsocketEvent {
+
+  type Event
 
   val d: Any
   val s: Option[Int]

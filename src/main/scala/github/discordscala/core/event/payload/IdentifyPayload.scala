@@ -2,14 +2,19 @@ package github.discordscala.core.event.payload
 
 import github.discordscala.core.models.Presence
 import github.discordscala.core._
+import github.discordscala.core.event.WebsocketEvent
 
 /**
   * IDENTIFY Payload of the Websocket (OP 2)
   *
-  * @param id Data sent by the Gateway
+  * @param d Data sent by the Gateway
   */
-case class IdentifyPayload(id: GatewayIdentificationData) extends GatewayPayload(2) {
-  override val d: Any = id
+case class IdentifyPayload(d: GatewayIdentificationData) extends WebsocketEvent {
+
+  override val s: Option[Int] = None
+  override val t: Option[String] = None
+  override val op: Option[Int] = Some(2)
+
 }
 
 /**
@@ -22,7 +27,7 @@ case class IdentifyPayload(id: GatewayIdentificationData) extends GatewayPayload
   * @param shard            The current shard ID
   * @param presence         Presence data
   */
-case class GatewayIdentificationData(token: String, properties: GatewayIdentificationProperties = GatewayIdentificationProperties(), compress: Boolean = false, large_threshold: Int = 100, shard: Array[Int] = Array(0, 1), presence: Option[Presence] = None)
+case class GatewayIdentificationData(token: String, properties: GatewayIdentificationProperties = GatewayIdentificationProperties(), compress: Boolean = false, large_threshold: Int = 100, shard: Array[Int] = Array(0, 1), presence: Option[Presence] = Some(Presence(status = Some("online"))))
 
 /**
   * Connection Properties sent by the Gateway. See Discord Gateway Documentation.
