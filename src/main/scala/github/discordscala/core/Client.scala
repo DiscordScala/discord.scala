@@ -1,6 +1,7 @@
 package github.discordscala.core
 
-import github.discordscala.core.event.{Sharding, WebsocketEvent}
+import akka.actor.ActorRef
+import github.discordscala.core.event.Sharding
 import github.discordscala.core.models.snowflake.User
 import github.discordscala.core.models.snowflake.guild.Guild
 import github.discordscala.core.util._
@@ -20,7 +21,7 @@ import scala.concurrent.Future
   * @param myShards   The shards that this specific client has control over. Multiple clients may be on different servers and control different shards
   * @param sharding   Shard specification for this client
   */
-case class Client(token: String, eventHandlers: Traversable[EventListener[_ <: WebsocketEvent]] = Seq(), gatewayURL: String = "wss://gateway.discord.gg/?v=6&encoding=json", apiURL: String = "https://discordapp.com/api/v6/", myShards: Set[Int])(implicit sharding: Sharding) {
+case class Client(token: String, eventHandlers: Traversable[ActorRef] = Seq(), gatewayURL: String = "wss://gateway.discord.gg/?v=6&encoding=json", apiURL: String = "https://discordapp.com/api/v6/", myShards: Set[Int])(implicit sharding: Sharding) {
 
   implicit val client: Client = this
 

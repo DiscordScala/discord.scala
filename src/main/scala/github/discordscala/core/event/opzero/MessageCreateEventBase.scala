@@ -7,7 +7,17 @@ import net.liftweb.json.JsonAST
 
 object MessageCreateEventBase extends WebsocketEventBase[MessageCreateEvent] {
 
-  override def apply(v: JsonAST.JValue, c: Client, w: WebsocketListener): MessageCreateEvent = MessageCreateEvent(v.extract[Message], w.shard)
+  override def apply(v: JsonAST.JValue, c: Client, w: WebsocketListener): MessageCreateEvent = {
+    println("creating payload")
+    try {
+      implicit val client: Client = c
+      val m = v.extract[Message]
+      println("creating event with payload")
+      MessageCreateEvent(m)(w.shard)
+    } catch {
+      case e: Exception => e.printStackTrace(); null
+    }
+  }
 
   override def eventName: Option[String] = Some("MESSAGE_CREATE")
 
@@ -15,7 +25,7 @@ object MessageCreateEventBase extends WebsocketEventBase[MessageCreateEvent] {
 
 }
 
-case class MessageCreateEvent(d: Message, shard: Shard) extends WebsocketEvent {
+case class MessageCreateEvent(d: Message)(val shard: Shard) extends WebsocketEvent {
 
   override val s: Option[Int] = None
   override val t: Option[String] = Some("MESSAGE_CREATE")

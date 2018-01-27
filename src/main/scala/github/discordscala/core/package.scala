@@ -2,12 +2,13 @@ package github.discordscala
 
 import java.time.Instant
 
+import akka.actor.ActorSystem
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import com.softwaremill.sttp.SttpBackend
 import com.softwaremill.sttp.akkahttp.AkkaHttpBackend
 import github.discordscala.core.models.snowflake.Snowflaked
-import github.discordscala.core.serializers.{ColorSerializer, SnowflakeSerializer, USnowflakeSerializer}
+import github.discordscala.core.serializers.{ColorSerializer, SnowflakeSerializer, USnowflakeSerializer, WebsocketEventSerializer}
 import net.liftweb.json._
 import spire.math.ULong
 
@@ -28,7 +29,8 @@ package object core {
 
   implicit val executor: ExecutionContextExecutor = ExecutionContext.global
   implicit val backend: SttpBackend[Future, Source[ByteString, Any]] = AkkaHttpBackend()
-  implicit val formats: Formats = DefaultFormats + SnowflakeSerializer + USnowflakeSerializer + ColorSerializer
+  implicit val formats: Formats = DefaultFormats + SnowflakeSerializer + USnowflakeSerializer + ColorSerializer + WebsocketEventSerializer
+  implicit val system: ActorSystem = ActorSystem("DiscordScala")
 
   implicit class SnowflakeUtil(s: Snowflaked) {
 

@@ -1,17 +1,16 @@
 package github.discordscala.core.util
 
 import akka.NotUsed
-import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import com.softwaremill.sttp._
 import github.discordscala.core._
-import net.liftweb.json._
 import net.liftweb.json.JsonAST.JValue
+import net.liftweb.json._
 
-import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.matching.Regex
 
 /**
@@ -22,7 +21,6 @@ object RequestUtil {
   val keyCorrectionReg: Regex = """_([a-z])""".r
   val keyDeCorrectionReg: Regex = """([A-Z])""".r
 
-  implicit val system = ActorSystem("DiscordScalaHTTPRequests")
   implicit val materializer = ActorMaterializer()
 
   /**

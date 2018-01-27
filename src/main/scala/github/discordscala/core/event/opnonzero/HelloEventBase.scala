@@ -16,11 +16,8 @@ object HelloEventBase extends WebsocketEventBase[HelloEvent] {
     * @return Websocket Event
     */
   override def apply(v: JsonAST.JValue, c: Client, w: WebsocketListener): HelloEvent = {
-    println("hello event apply")
     val hd = v.extract[HelloData]
-    println("extracted")
     val e = HelloEvent(hd)(w.shard)
-    println("constructed")
     e
   }
 

@@ -1,16 +1,14 @@
 package github.discordscala.core.event
 
 import akka.NotUsed
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.{Actor, ActorRef, Props}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.ws.{Message, TextMessage, WebSocketRequest, WebSocketUpgradeResponse}
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.{Client => _, _}
 import github.discordscala.core._
-import github.discordscala.core.event.opnonzero.{HeartbeatEvent, HelloEvent, HelloEventBase}
-import github.discordscala.core.event.opzero.{MessageCreateEvent, MessageCreateEventBase}
+import github.discordscala.core.event.opnonzero.{HeartbeatEvent, HelloEvent}
 import github.discordscala.core.event.payload.{GatewayIdentificationData, IdentifyPayload}
-import github.discordscala.core.util.EventListener
 import net.liftweb.json._
 import org.clapper.classutil.ClassFinder
 
@@ -34,7 +32,6 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
     case JField(key, value) => JField(keyCorrectionReg.replaceAllIn(key, (m) => m.group(1).toUpperCase), value)
   }
 
-  implicit val system: ActorSystem = ActorSystem("WebsocketListenerSystem")
   implicit val materializer: Materializer = ActorMaterializer()
 
   sharding.myListenerShards += (shard.shardNumber -> this)
@@ -49,28 +46,27 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
 
   var currentRequest: (ActorRef, (Future[WebSocketUpgradeResponse], UniqueKillSwitch)) = _
 
-  val requiredHandlers: Traversable[EventListener[_ <: WebsocketEvent]] = Seq(
-    new EventListener[HelloEvent] {
-      override def base: WebsocketEventBase[HelloEvent] = HelloEventBase
-      override def apply(e: HelloEvent): Unit = {
-        println("hello handled")
-        heartbeatThread = new Thread(() => {
-          while (true) {
-            currentRequest._1.heartbeat(HeartbeatEvent(lastSequence))
-            Thread.sleep(e.d.heartbeatInterval.toLong)
-          }
-        })
-        heartbeatThread.start()
-        currentRequest._1.identify()
+  lazy val requiredHandlers: Traversable[ActorRef] = {
+    class HelloHandler() extends Actor {
+      def receive: PartialFunction[Any, Unit] = {
+        case HelloEvent(d) =>
+          heartbeatThread = new Thread(() => {
+            while (true) {
+              currentRequest._1.heartbeat(HeartbeatEvent(lastSequence))
+              Thread.sleep(d.heartbeatInterval.toLong)
+            }
+          })
+          heartbeatThread.start()
+          currentRequest._1.identify()
       }
-    },
-    new EventListener[MessageCreateEvent] {
-      override def base: WebsocketEventBase[MessageCreateEvent] = MessageCreateEventBase
-      override def apply(e: MessageCreateEvent): Unit = {
-        println(s"message created, $e")
-      }
-    },
-  )
+    }
+    try {
+      val ref = system.actorOf(Props(new HelloHandler), "helloHandler")
+      Seq(ref)
+    } catch {
+      case e: Exception => e.printStackTrace(); Seq()
+    }
+  }
 
   def startRequest: (ActorRef, (Future[WebSocketUpgradeResponse], UniqueKillSwitch)) = {
     val r = Http().webSocketClientFlow(req)
@@ -92,27 +88,36 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
 
   def handleGateway(m: Message): Future[Unit] = Future {
     val js = m.asTextMessage.getStrictText
-    println(s"json is $js")
+    println(js)
     val jast = correctInput(parse(js))
+    val s = jast \ "s"
+    s match {
+      case JInt(n) => lastSequence = Some(n.intValue())
+      case _ =>
+    }
     val web = jast \ "op" match {
-      case JInt(b) if b == BigInt(0) => println("zmap")
+      case JInt(b) if b == BigInt(0) =>
         jast \ "t" match {
-          case JString(e) => println(s"zmap got $e"); WebsocketListener.opZeroMap(e)
+          case JString(e) => println(WebsocketListener.opZeroMap); println(e); val a = WebsocketListener.opZeroMap.get(e); println(a); a
         }
-      case JInt(b) => println(s"nzmap got $b, ${WebsocketListener.opNonZeroMap.size}"); val a = WebsocketListener.opNonZeroMap(b.toInt); println(s"got $a"); a
+      case JInt(b) => WebsocketListener.opNonZeroMap.get(b.toInt)
     }
-    println(HelloEventBase)
-    println(web.eventOp)
-    val completeSet = c.eventHandlers ++ requiredHandlers
-    println("completed set")
-    println(compactRender(jast \ "d"))
-    val event = web(jast \ "d", c, this)
-    println(s"starting iter, ${completeSet.size}")
-    completeSet.foreach {
-      case listener if listener.base == web => println("correct listener"); listener(event.asInstanceOf[listener.Event])
-      case _ => println("not a correct listener")
+    web match {
+      case Some(nob) =>
+        val completeSet = requiredHandlers ++ c.eventHandlers
+        println(completeSet.size)
+        val event = nob(jast \ "d", c, this)
+        println(event)
+        completeSet.foreach((s) => {
+          try {
+            s ! event
+          } catch {
+            case e: Exception => e.printStackTrace()
+          }
+        })
+      case None =>
+        println("none")
     }
-    println("done with handling")
   }
 
   implicit class GatewayWebsocket(ar: ActorRef) {
@@ -125,7 +130,6 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
       val corrected = j transformField {
         case JField(key, value) => JField(keyDeCorrectionReg.replaceAllIn(key, (m) => s"_${m.matched.toLowerCase}"), value)
       }
-      println(s"sending ${compactRender(j)}")
       ar ! TextMessage(compactRender(j))
     }
 
@@ -135,16 +139,17 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
 
 object WebsocketListener {
 
-  lazy val allBases: TraversableOnce[WebsocketEventBase[_ <: WebsocketEvent]] = {
+  lazy val allBases: Traversable[WebsocketEventBase[_ <: WebsocketEvent]] = {
     val classFinder = ClassFinder()
     val classes = classFinder.getClasses()
     val eventBases = ClassFinder.concreteSubclasses("github.discordscala.core.event.WebsocketEventBase", classes)
     eventBases.filter(_.name.endsWith("$class"))
     val rm = ru.runtimeMirror(ClassLoader.getSystemClassLoader)
-    eventBases.map((ci) => rm.reflectModule(rm.staticModule(ci.name)).instance.asInstanceOf[WebsocketEventBase[_ <: WebsocketEvent]])
+    eventBases.map((ci) => rm.reflectModule(rm.staticModule(ci.name)).instance.asInstanceOf[WebsocketEventBase[_ <: WebsocketEvent]]).toSeq
   }
 
   lazy val opZeroMap: Map[String, WebsocketEventBase[_ <: WebsocketEvent]] = {
+    println(allBases)
     val zeroBases = allBases.filter(_.eventOp == 0)
     zeroBases.map((b) => (b.eventName.get, b)).toMap
   }
@@ -158,8 +163,6 @@ object WebsocketListener {
 case class Sharding(max_shards: Int) {
 
   val myListenerShards: mutable.Map[Int, WebsocketListener] = mutable.Map()
-
-  lazy val system: ActorSystem = ActorSystem("DiscordScalaWebsocketSharding")
 
   def addListener(l: WebsocketListener): Unit = {
     val m = (myListenerShards + (-1 -> null)).maxBy(_._1)._1
