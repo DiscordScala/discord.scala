@@ -4,6 +4,7 @@ import github.discordscala.core.models.snowflake.guild.{Guild, Member}
 import github.discordscala.core.{Client, _}
 import github.discordscala.core.util.{DiscordException, RequestUtil}
 import spire.math.ULong
+import net.liftmodules.jsonextractorng.Extraction._
 
 /**
   * Representation of an User
@@ -41,12 +42,12 @@ object User {
 
   def apply(id: ULong)(implicit client: Client): Either[DiscordException, User] = RequestUtil.awaitRestRequestFuture(client.apiURL + s"users/$id", Map("Authorization" -> client.token)) match {
     case Left(e) => Left(e)
-    case Right(j) => Right(j.extract[User])
+    case Right(j) => Right(j.extractNg[User])
   }
 
   def apply(c: Client): Either[DiscordException, User] = RequestUtil.awaitRestRequestFuture(c.apiURL + "users/@me", Map("Authorization" -> c.token)) match {
     case Left(e) => Left(e)
-    case Right(j) => Right(j.extract[User])
+    case Right(j) => Right(j.extractNg[User])
   }
 
 }

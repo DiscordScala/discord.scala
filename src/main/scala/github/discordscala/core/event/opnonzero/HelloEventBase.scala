@@ -4,6 +4,7 @@ import github.discordscala.core._
 import github.discordscala.core.event.payload.GatewayPayload
 import github.discordscala.core.event.{WebsocketEventBase, WebsocketListener}
 import net.liftweb.json.JsonAST
+import net.liftmodules.jsonextractorng.Extraction._
 
 object HelloEventBase extends WebsocketEventBase[HelloEvent] {
 
@@ -16,7 +17,7 @@ object HelloEventBase extends WebsocketEventBase[HelloEvent] {
     * @return Websocket Event
     */
   override def apply(v: JsonAST.JValue, c: Client, w: WebsocketListener): HelloEvent = {
-    val hd = v.extract[HelloData]
+    val hd = v.extractNg[HelloData]
     val e = HelloEvent(hd)(w.shard)
     e
   }

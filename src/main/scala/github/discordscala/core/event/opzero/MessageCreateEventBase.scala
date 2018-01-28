@@ -4,6 +4,7 @@ import github.discordscala.core._
 import github.discordscala.core.event.{WebsocketEvent, WebsocketEventBase, WebsocketListener}
 import github.discordscala.core.models.snowflake.Message
 import net.liftweb.json.JsonAST
+import net.liftmodules.jsonextractorng.Extraction._
 
 object MessageCreateEventBase extends WebsocketEventBase[MessageCreateEvent] {
 
@@ -11,7 +12,7 @@ object MessageCreateEventBase extends WebsocketEventBase[MessageCreateEvent] {
     println("creating payload")
     try {
       implicit val client: Client = c
-      val m = v.extract[Message]
+      val m = v.extractNg[Message]
       println("creating event with payload")
       MessageCreateEvent(m)(w.shard)
     } catch {

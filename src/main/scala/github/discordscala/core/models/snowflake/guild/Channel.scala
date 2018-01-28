@@ -6,6 +6,7 @@ import github.discordscala.core._
 import github.discordscala.core.models.snowflake.{Message, Snowflaked, User}
 import github.discordscala.core.util._
 import net.liftweb.json.Extraction
+import net.liftmodules.jsonextractorng.Extraction._
 import net.liftweb.json.JsonAST.JValue
 import spire.math.ULong
 
@@ -37,35 +38,35 @@ case class Channel(
   def messagesAround(aroundId: ULong, limit: Int = 50): Future[Either[DiscordException, Messages]] = Future {
     RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$id/messages?around=$aroundId&limit=$limit", Map("Authorization" -> client.token)) match {
       case Left(e) => Left(e)
-      case Right(j) => Right(new Messages(j.extract[Seq[Message]], this))
+      case Right(j) => Right(new Messages(j.extractNg[Seq[Message]], this))
     }
   }
 
   def messagesBefore(beforeId: ULong, limit: Int = 50): Future[Either[DiscordException, Messages]] = Future {
     RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$id/messages?before=$beforeId&limit=$limit", Map("Authorization" -> client.token)) match {
       case Left(e) => Left(e)
-      case Right(j) => Right(new Messages(j.extract[Seq[Message]], this))
+      case Right(j) => Right(new Messages(j.extractNg[Seq[Message]], this))
     }
   }
 
   def messagesAfter(afterId: ULong, limit: Int = 50): Future[Either[DiscordException, Messages]] = Future {
     RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$id/messages?after=$afterId&limit=$limit", Map("Authorization" -> client.token)) match {
       case Left(e) => Left(e)
-      case Right(j) => Right(new Messages(j.extract[Seq[Message]], this))
+      case Right(j) => Right(new Messages(j.extractNg[Seq[Message]], this))
     }
   }
 
   def message(mid: ULong): Future[Either[DiscordException, Message]] = Future {
     RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$id/messages/$mid", Map("Authorization" -> client.token)) match {
       case Left(e) => Left(e)
-      case Right(j) => Right(j.extract[Message])
+      case Right(j) => Right(j.extractNg[Message])
     }
   }
 
   def postMessage(m: Message): Future[Either[DiscordException, Message]] = Future {
     RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$id/messages", Map("Authorization" -> client.token), Post, Extraction.decompose(m), Duration.Inf) match {
       case Left(e) => Left(e)
-      case Right(j) => Right(j.extract[Message])
+      case Right(j) => Right(j.extractNg[Message])
     }
   }
 
@@ -89,7 +90,7 @@ object Channel {
 
   def apply(id: ULong)(implicit client: Client): Either[DiscordException, Channel] = RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$id", Map("Authorization" -> client.token)) match {
     case Left(e) => Left(e)
-    case Right(j) => Right(j.extract[Channel])
+    case Right(j) => Right(j.extractNg[Channel])
   }
 
 }

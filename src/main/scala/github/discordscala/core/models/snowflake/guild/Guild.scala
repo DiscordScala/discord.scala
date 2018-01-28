@@ -7,6 +7,7 @@ import github.discordscala.core.models.snowflake.{Snowflaked, User}
 import github.discordscala.core.models.{Presence, Region}
 import github.discordscala.core.util.{CombinedOrUnknown, DiscordException, RequestUtil}
 import net.liftweb.json.JsonAST.JValue
+import net.liftmodules.jsonextractorng.Extraction._
 import spire.math.ULong
 
 case class Guild(
@@ -58,7 +59,7 @@ object Guild {
 
   def apply(id: ULong)(implicit client: Client): Either[DiscordException, Guild] = RequestUtil.awaitRestRequestFuture(client.apiURL + s"guilds/$id", Map("Authorization" -> client.token)) match {
     case Left(e) => Left(e)
-    case Right(j) => Right(j.extract[Guild])
+    case Right(j) => Right(j.extractNg[Guild])
   }
 
 }

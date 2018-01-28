@@ -6,6 +6,7 @@ import github.discordscala.core.models.snowflake.User
 import github.discordscala.core.models.snowflake.guild.Guild
 import github.discordscala.core.util._
 import net.liftweb.json._
+import net.liftmodules.jsonextractorng.Extraction._
 import spire.math.ULong
 
 import scala.concurrent.Future
@@ -51,7 +52,7 @@ case class Client(token: String, eventHandlers: Traversable[ActorRef] = Seq(), g
   def guilds: Future[Either[DiscordException, Array[Guild]]] = Future {
     RequestUtil.awaitRestRequestFuture(apiURL + "guilds", headers = Map("Authorization" -> token), Get) match {
       case Left(e) => Left(e)
-      case Right(j) => Right(j.extract[Array[Guild]])
+      case Right(j) => Right(j.extractNg[Array[Guild]])
     }
   }
 
@@ -63,7 +64,7 @@ case class Client(token: String, eventHandlers: Traversable[ActorRef] = Seq(), g
     */
   def username_=(newUsername: String): Future[Either[DiscordException, User]] = RequestUtil.restRequestFuture(s"${apiURL}users/@me", Map("Authorization" -> token), Patch, Extraction.decompose(User(username = Some(newUsername)))).map {
     case Left(e) => Left(e)
-    case Right(j) => Right(j.extract[User])
+    case Right(j) => Right(j.extractNg[User])
   }
 
   /**
