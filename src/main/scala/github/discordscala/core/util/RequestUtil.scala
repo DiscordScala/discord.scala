@@ -79,6 +79,7 @@ object RequestUtil {
         case Get => sttp.get(uri"$url")
         case Post => sttp.post(uri"$url")
         case Patch => sttp.patch(uri"$url")
+        case Delete => sttp.delete(uri"$url")
       }).headers(headers + ("User-Agent" -> s"$userAgentName/$userAgentVersion"))
       val request = (body match {
         case Some((mime, content)) => brequest.contentType(mime, "UTF-8").streamBody(Source.single(ByteString(content, "UTF-8")))
@@ -136,6 +137,11 @@ case object Post extends RequestMethod
   * PATCH request
   */
 case object Patch extends RequestMethod
+
+/**
+  * DELETE request
+  */
+case object Delete extends RequestMethod
 
 /**
   * Exceptions that can occur when making connections

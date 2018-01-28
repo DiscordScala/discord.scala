@@ -1,29 +1,25 @@
 package com.oof.boof
 
-import akka.actor.{Actor, ActorSystem, Props}
+import akka.actor.ActorSystem
 import github.discordscala.core.Client
 import github.discordscala.core.event.Sharding
-import github.discordscala.core.event.opzero.MessageCreateEvent
+import github.discordscala.core.models.snowflake.Message
+import github.discordscala.core.models.snowflake.guild.Channel
+import spire.math.ULong
 
 object SomethingOofedInTheNeighborhood {
 
   def main(args: Array[String]): Unit = {
     implicit val sharding: Sharding = Sharding(1)
     val myActorSystem = ActorSystem("ClientActorSystem")
-    val c = Client("Bot [token]", myShards = Set(0), eventHandlers = Seq(
-      {
-        class DabListener extends Actor {
-          override def receive: Receive = {
-            case MessageCreateEvent(m) =>
-              if(m.content.get == "dab" && !m.author.get.bot.get) {
-                println("dab")
-              }
-          }
-        }
-        myActorSystem.actorOf(Props(new DabListener), "dabListener")
-      }
-    ))
+    val c = Client("Bot [token]", myShards = Set(0))
     c.login()
+    Thread.sleep(20000)
+    implicit val client: Client = c
+    Channel(ULong(390752467878412288l)) match {
+      case Left(e) =>
+      case Right(ch) => ch.postMessage(Message(content = Some("dab")))
+    }
   }
 
 }

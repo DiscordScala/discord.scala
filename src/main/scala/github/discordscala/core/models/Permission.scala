@@ -1,5 +1,18 @@
 package github.discordscala.core.models
 
+object Permissions {
+
+  def apply(perms: Permission*): Permissions = new Permissions(perms)
+  def unapply(arg: Permissions): Option[Seq[Permission]] = Some(arg.permissions)
+
+}
+
+class Permissions(val permissions: Seq[Permission]) {
+
+  def toLong: Long = permissions.foldLeft(0l)((acc: Long, p: Permission) => acc | p.value)
+
+}
+
 sealed trait Permission {
 
   val id: String

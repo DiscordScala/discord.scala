@@ -1,5 +1,6 @@
 package github.discordscala.core.models.snowflake
 
+import github.discordscala.core.models.snowflake.guild.{Guild, Member}
 import github.discordscala.core.{Client, _}
 import github.discordscala.core.util.{DiscordException, RequestUtil}
 import spire.math.ULong
@@ -25,6 +26,14 @@ case class User(
                  mfa: Option[Boolean] = None,
                  verified: Option[Boolean] = None,
                  email: Option[String] = None)(implicit client: Client) extends Snowflaked {
+
+  override type Self = User
+
+  def asMemberOf(g: Guild): Member = {
+    null // FIXME complete this @gerd
+  }
+
+  def ! : Either[DiscordException, User] = User(id.get)
 
 }
 

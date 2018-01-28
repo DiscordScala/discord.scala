@@ -5,7 +5,7 @@ import java.time.Instant
 import github.discordscala.core._
 import github.discordscala.core.models.snowflake.{Snowflaked, User}
 import github.discordscala.core.models.{Presence, Region}
-import github.discordscala.core.util.{DiscordException, RequestUtil}
+import github.discordscala.core.util.{CombinedOrUnknown, DiscordException, RequestUtil}
 import net.liftweb.json.JsonAST.JValue
 import spire.math.ULong
 
@@ -42,6 +42,15 @@ case class Guild(
                   channels: Option[Array[JValue]] = None, // TODO implement channel
                   presences: Option[Array[Presence]] = None,
            )(implicit client: Client) extends Snowflaked {
+
+  override type Self = Guild
+
+  override def ! : Either[DiscordException, Guild] = {
+    id match {
+      case Some(i) => Guild(i)
+      case None => Left(CombinedOrUnknown)
+    }
+  }
 
 }
 

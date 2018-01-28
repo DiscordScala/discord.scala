@@ -3,8 +3,13 @@ package github.discordscala.core.models.snowflake
 import java.time.Instant
 
 import github.discordscala.core.Client
+import github.discordscala.core.models.snowflake.guild.Channel
+import github.discordscala.core.util.{CombinedOrUnknown, DiscordException}
 import net.liftweb.json.JsonAST.JValue
 import spire.math.ULong
+
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 /**
   * Representation of a message
@@ -46,5 +51,23 @@ case class Message( // TODO convert JValues into their respective objects
                     webhookId: Option[Boolean] = None,
                     `type`: Option[Int] = None
                   )(implicit client: Client) extends Snowflaked {
+
+  override type Self = Message
+
+  override def ! : Either[DiscordException, Message] = {
+    channelId match {
+      case Some(i) => Channel(i) match {
+        case Left(e) => Left(e)
+        case Right(c) => id match {
+          case Some(m) => Await.result(c.message(m), Duration.Inf) match {
+            case Left(n) => Left(n)
+            case Right(o) => Right(o)
+          }
+          case None => Left(CombinedOrUnknown)
+        }
+      }
+      case None => Left(CombinedOrUnknown)
+    }
+  }
 
 }
