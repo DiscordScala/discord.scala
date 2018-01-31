@@ -19,11 +19,11 @@ case class Role(
                  permissions: Option[Int], // TODO Convert to Permissions objects
                  managed: Option[Boolean],
                  mentionable: Option[Boolean]
-               )(implicit client: Client) extends Snowflaked {
+               ) extends Snowflaked {
 
   override type Self = Role
 
-  def guild: Future[Either[DiscordException, Option[Guild]]] = Future {
+  def guild(implicit client: Client): Future[Either[DiscordException, Option[Guild]]] = Future {
     id match {
       case Some(i) =>
         val de = Await.result(client.guilds, Duration.Inf)
@@ -38,7 +38,7 @@ case class Role(
     }
   }
 
-  override def ! : Either[DiscordException, Role] = {
+  override def !(implicit client: Client) : Either[DiscordException, Role] = {
     id match {
       case Some(i) => Await.result(Role(i), Duration.Inf) match {
         case Left(e) => Left(e)

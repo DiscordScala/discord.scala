@@ -50,11 +50,11 @@ case class Message( // TODO convert JValues into their respective objects
                     pinned: Option[Boolean] = None,
                     webhookId: Option[Boolean] = None,
                     `type`: Option[Int] = None
-                  )(implicit client: Client) extends Snowflaked {
+                  ) extends Snowflaked {
 
   override type Self = Message
 
-  override def ! : Either[DiscordException, Message] = {
+  override def !(implicit client: Client) : Either[DiscordException, Message] = {
     channelId match {
       case Some(i) => Channel(i) match {
         case Left(e) => Left(e)

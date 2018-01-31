@@ -34,7 +34,7 @@ case class User(
     null // FIXME complete this @gerd
   }
 
-  def ! : Either[DiscordException, User] = User(id.get)
+  def !(implicit client: Client) : Either[DiscordException, User] = User(id.get)
 
 }
 

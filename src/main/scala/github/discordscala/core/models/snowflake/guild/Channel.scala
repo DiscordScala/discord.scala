@@ -31,46 +31,46 @@ case class Channel(
                     applicationId: Option[ULong] = None,
                     parentId: Option[ULong] = None,
                     lastPinTimestamp: Option[Instant] = None
-                  )(implicit client: Client) extends Snowflaked {
+                  ) extends Snowflaked {
 
   override type Self = Channel
 
-  def messagesAround(aroundId: ULong, limit: Int = 50): Future[Either[DiscordException, Messages]] = Future {
+  def messagesAround(aroundId: ULong, limit: Int = 50)(implicit client: Client): Future[Either[DiscordException, Messages]] = Future {
     RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$id/messages?around=$aroundId&limit=$limit", Map("Authorization" -> client.token)) match {
       case Left(e) => Left(e)
       case Right(j) => Right(new Messages(j.extractNg[Seq[Message]], this))
     }
   }
 
-  def messagesBefore(beforeId: ULong, limit: Int = 50): Future[Either[DiscordException, Messages]] = Future {
+  def messagesBefore(beforeId: ULong, limit: Int = 50)(implicit client: Client): Future[Either[DiscordException, Messages]] = Future {
     RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$id/messages?before=$beforeId&limit=$limit", Map("Authorization" -> client.token)) match {
       case Left(e) => Left(e)
       case Right(j) => Right(new Messages(j.extractNg[Seq[Message]], this))
     }
   }
 
-  def messagesAfter(afterId: ULong, limit: Int = 50): Future[Either[DiscordException, Messages]] = Future {
+  def messagesAfter(afterId: ULong, limit: Int = 50)(implicit client: Client): Future[Either[DiscordException, Messages]] = Future {
     RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$id/messages?after=$afterId&limit=$limit", Map("Authorization" -> client.token)) match {
       case Left(e) => Left(e)
       case Right(j) => Right(new Messages(j.extractNg[Seq[Message]], this))
     }
   }
 
-  def message(mid: ULong): Future[Either[DiscordException, Message]] = Future {
+  def message(mid: ULong)(implicit client: Client): Future[Either[DiscordException, Message]] = Future {
     RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$id/messages/$mid", Map("Authorization" -> client.token)) match {
       case Left(e) => Left(e)
       case Right(j) => Right(j.extractNg[Message])
     }
   }
 
-  def postMessage(m: Message): Future[Either[DiscordException, Message]] = Future {
+  def postMessage(m: Message)(implicit client: Client): Future[Either[DiscordException, Message]] = Future {
     RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$id/messages", Map("Authorization" -> client.token), Post, Extraction.decompose(m), Duration.Inf) match {
       case Left(e) => Left(e)
       case Right(j) => Right(j.extractNg[Message])
     }
   }
 
-  def deleteMessage(m: Message): Future[Either[DiscordException, Unit]] = Future {
+  def deleteMessage(m: Message)(implicit client: Client): Future[Either[DiscordException, Unit]] = Future {
     m.id match {
       case Some(messageId) =>
         RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$id/messages/$messageId", Map("Authorization" -> client.token), Delete) match {
@@ -82,7 +82,7 @@ case class Channel(
 
   }
 
-  override def ! : Either[DiscordException, Channel] = Channel(id.get)
+  override def !(implicit client: Client) : Either[DiscordException, Channel] = Channel(id.get)
 
 }
 
@@ -95,7 +95,7 @@ object Channel {
 
 }
 
-class Messages(private val messages: Seq[Message], val channel: Channel) extends Set[Message] {
+class Messages(private val messages: Seq[Message], val channel: Channel)(implicit client: Client) extends Set[Message] {
 
   override def contains(elem: Message): Boolean = messages.map(_.id).contains(elem.id)
 

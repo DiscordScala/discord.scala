@@ -50,6 +50,7 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
     class HelloHandler() extends Actor {
       def receive: PartialFunction[Any, Unit] = {
         case HelloEvent(d) =>
+          println("dab")
           heartbeatThread = new Thread(() => {
             while (true) {
               currentRequest._1.heartbeat(HeartbeatEvent(lastSequence))
@@ -87,36 +88,40 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
   }
 
   def handleGateway(m: Message): Future[Unit] = Future {
-    val js = m.asTextMessage.getStrictText
-    println(js)
-    val jast = correctInput(parse(js))
-    val s = jast \ "s"
-    s match {
-      case JInt(n) => lastSequence = Some(n.intValue())
-      case _ =>
-    }
-    val web = jast \ "op" match {
-      case JInt(b) if b == BigInt(0) =>
-        jast \ "t" match {
-          case JString(e) => println(WebsocketListener.opZeroMap); println(e); val a = WebsocketListener.opZeroMap.get(e); println(a); a
-        }
-      case JInt(b) => WebsocketListener.opNonZeroMap.get(b.toInt)
-    }
-    web match {
-      case Some(nob) =>
-        val completeSet = requiredHandlers ++ c.eventHandlers
-        println(completeSet.size)
-        val event = nob(jast \ "d", c, this)
-        println(event)
-        completeSet.foreach((s) => {
-          try {
-            s ! event
-          } catch {
-            case e: Exception => e.printStackTrace()
+    try {
+      val js = m.asTextMessage.getStrictText
+      println(js)
+      val jast = correctInput(parse(js))
+      val s = jast \ "s"
+      s match {
+        case JInt(n) => lastSequence = Some(n.intValue())
+        case _ =>
+      }
+      val web = jast \ "op" match {
+        case JInt(b) if b == BigInt(0) =>
+          jast \ "t" match {
+            case JString(e) => println(WebsocketListener.opZeroMap); println(e); val a = WebsocketListener.opZeroMap.get(e); println(a); a
           }
-        })
-      case None =>
-        println("none")
+        case JInt(b) => WebsocketListener.opNonZeroMap.get(b.toInt)
+      }
+      web match {
+        case Some(nob) =>
+          val completeSet = requiredHandlers ++ c.eventHandlers
+          println(completeSet.size)
+          val event = nob(jast \ "d", c, this)
+          println(event)
+          completeSet.foreach((s) => {
+            try {
+              s ! event
+            } catch {
+              case e: Exception => e.printStackTrace()
+            }
+          })
+        case None =>
+          println("none")
+      }
+    } catch {
+      case e: Exception => e.printStackTrace()
     }
   }
 

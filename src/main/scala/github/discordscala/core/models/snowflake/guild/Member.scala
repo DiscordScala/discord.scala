@@ -17,9 +17,9 @@ case class Member(
                    joinedAt: Option[Instant] = None,
                    deaf: Option[Boolean] = None,
                    mute: Option[Boolean] = None
-                 )(implicit client: Client) {
+                 ) {
 
-  def memberRoles: Future[Either[DiscordException, Array[Role]]] = Future {
+  def memberRoles(implicit client: Client): Future[Either[DiscordException, Array[Role]]] = Future {
     val ta = roles.map(_.map((s) => Await.result(Role(ULong(s.toLong)), Duration.Inf)))
     ta match {
       case Some(a) =>

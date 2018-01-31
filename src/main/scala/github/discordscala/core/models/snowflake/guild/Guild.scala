@@ -42,11 +42,11 @@ case class Guild(
                   members: Option[Array[User]] = None, // TODO make User associated with guild by having partial Member values
                   channels: Option[Array[JValue]] = None, // TODO implement channel
                   presences: Option[Array[Presence]] = None,
-           )(implicit client: Client) extends Snowflaked {
+           ) extends Snowflaked {
 
   override type Self = Guild
 
-  override def ! : Either[DiscordException, Guild] = {
+  override def !(implicit client: Client) : Either[DiscordException, Guild] = {
     id match {
       case Some(i) => Guild(i)
       case None => Left(CombinedOrUnknown)

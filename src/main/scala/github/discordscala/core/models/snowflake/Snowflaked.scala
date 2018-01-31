@@ -1,5 +1,6 @@
 package github.discordscala.core.models.snowflake
 
+import github.discordscala.core.Client
 import github.discordscala.core.util.DiscordException
 import spire.math.ULong
 
@@ -12,6 +13,6 @@ trait Snowflaked {
 
   val id: Option[ULong]
 
-  def ! : Either[DiscordException, Self]
+  def !(implicit client: Client) : Either[DiscordException, Self]
 
 }
