@@ -150,10 +150,19 @@ sealed trait DiscordException
 
 case object BadRequest extends DiscordException
 
+/**
+  * Effectively a 401
+  */
 case object Unauthorized extends DiscordException
 
+/**
+  * Effectively a 403
+  */
 case object Forbidden extends DiscordException
 
+/**
+  * Effectively a 404
+  */
 case object NotFound extends DiscordException
 
 case object GatewayUnavailable extends DiscordException
