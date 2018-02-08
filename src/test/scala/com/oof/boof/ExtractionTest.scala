@@ -10,15 +10,15 @@ object ExtractionTest {
   def main(args: Array[String]): Unit = {
     val json = """{
                  |    "id": "41771983423143937",
-                 |    "guild_id": "41771983423143937",
+                 |    "guildId": "41771983423143937",
                  |    "name": "general",
                  |    "type": 0,
                  |    "position": 6,
-                 |    "permission_overwrites": [],
+                 |    "permissionOverwrites": [],
                  |    "nsfw": true,
                  |    "topic": "24/7 chat about how to gank Mike #2",
-                 |    "last_message_id": "155117677105512449",
-                 |    "parent_id": "399942396007890945"
+                 |    "lastMessageId": "155117677105512449",
+                 |    "parentId": "399942396007890945"
                  |}""".stripMargin
     val jvalue = parse(json)
     val channel = jvalue.extractNg[Channel]

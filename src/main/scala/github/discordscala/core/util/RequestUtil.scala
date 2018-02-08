@@ -60,7 +60,7 @@ object RequestUtil {
     * @param timeout How long to wait for an Answer
     * @return Either a Discord Exception or the response
     */
-  def awaitRestRequestFuture(url: String, headers: Map[String, String], method: RequestMethod = Get, body: Option[(String, String)] = None, timeout: Duration = Duration.Inf): Either[DiscordException, JValue] = Await.result(restRequestFuture(url, headers), timeout)
+  def awaitRestRequestFuture(url: String, headers: Map[String, String], method: RequestMethod = Get, body: Option[(String, String)] = None, timeout: Duration = Duration.Inf): Either[DiscordException, JValue] = Await.result(restRequestFuture(url, headers, method, body), timeout)
 
   /**
     * Method that makes a REST request

@@ -17,7 +17,7 @@ object SomethingOofedInTheNeighborhood {
     Thread.sleep(20000)
     implicit val client: Client = c
     Channel(ULong(390752467878412288l)) match {
-      case Left(e) =>
+      case Left(e) => println(e)
       case Right(ch) => ch.postMessage(Message(content = Some("dab")))
     }
   }

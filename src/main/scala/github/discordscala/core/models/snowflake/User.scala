@@ -26,7 +26,7 @@ case class User(
                  bot: Option[Boolean] = None,
                  mfa: Option[Boolean] = None,
                  verified: Option[Boolean] = None,
-                 email: Option[String] = None)(implicit client: Client) extends Snowflaked {
+                 email: Option[String] = None) extends Snowflaked {
 
   override type Self = User
 

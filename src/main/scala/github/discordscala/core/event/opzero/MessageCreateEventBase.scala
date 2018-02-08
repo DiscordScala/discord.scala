@@ -9,11 +9,9 @@ import net.liftmodules.jsonextractorng.Extraction._
 object MessageCreateEventBase extends WebsocketEventBase[MessageCreateEvent] {
 
   override def apply(v: JsonAST.JValue, c: Client, w: WebsocketListener): MessageCreateEvent = {
-    println("creating payload")
     try {
       implicit val client: Client = c
       val m = v.extractNg[Message]
-      println("creating event with payload")
       MessageCreateEvent(m)(w.shard)
     } catch {
       case e: Exception => e.printStackTrace(); null

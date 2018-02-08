@@ -50,7 +50,6 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
     class HelloHandler() extends Actor {
       def receive: PartialFunction[Any, Unit] = {
         case HelloEvent(d) =>
-          println("dab")
           heartbeatThread = new Thread(() => {
             while (true) {
               currentRequest._1.heartbeat(HeartbeatEvent(lastSequence))
@@ -90,7 +89,6 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
   def handleGateway(m: Message): Future[Unit] = Future {
     try {
       val js = m.asTextMessage.getStrictText
-      println(js)
       val jast = correctInput(parse(js))
       val s = jast \ "s"
       s match {
@@ -100,16 +98,14 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
       val web = jast \ "op" match {
         case JInt(b) if b == BigInt(0) =>
           jast \ "t" match {
-            case JString(e) => println(WebsocketListener.opZeroMap); println(e); val a = WebsocketListener.opZeroMap.get(e); println(a); a
+            case JString(e) => WebsocketListener.opZeroMap.get(e)
           }
         case JInt(b) => WebsocketListener.opNonZeroMap.get(b.toInt)
       }
       web match {
         case Some(nob) =>
           val completeSet = requiredHandlers ++ c.eventHandlers
-          println(completeSet.size)
           val event = nob(jast \ "d", c, this)
-          println(event)
           completeSet.foreach((s) => {
             try {
               s ! event
@@ -118,7 +114,6 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
             }
           })
         case None =>
-          println("none")
       }
     } catch {
       case e: Exception => e.printStackTrace()
@@ -154,7 +149,6 @@ object WebsocketListener {
   }
 
   lazy val opZeroMap: Map[String, WebsocketEventBase[_ <: WebsocketEvent]] = {
-    println(allBases)
     val zeroBases = allBases.filter(_.eventOp == 0)
     zeroBases.map((b) => (b.eventName.get, b)).toMap
   }

@@ -64,9 +64,13 @@ case class Channel(
   }
 
   def postMessage(m: Message)(implicit client: Client): Future[Either[DiscordException, Message]] = Future {
-    RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$id/messages", Map("Authorization" -> client.token), Post, Extraction.decompose(m), Duration.Inf) match {
-      case Left(e) => Left(e)
-      case Right(j) => Right(j.extractNg[Message])
+    id match {
+      case Some(i) =>
+        RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$i/messages", Map("Authorization" -> client.token), Post, Extraction.decompose(m), Duration.Inf) match {
+          case Left(e) => Left(e)
+          case Right(j) => Right(j.extractNg[Message])
+        }
+      case None => Left(CombinedOrUnknown)
     }
   }
 

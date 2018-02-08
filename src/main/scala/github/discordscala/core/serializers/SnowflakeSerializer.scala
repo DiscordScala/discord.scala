@@ -11,6 +11,7 @@ object SnowflakeSerializer extends Serializer[Long] {
   override def deserialize(implicit format: Formats): PartialFunction[(TypeInfo, JValue), Long] = {
     case (TypeInfo(`longClazz`, _), json) => json match {
       case JString(s) => s.toLong
+      case JInt(i) => i.toLong
       case x => throw new MappingException("Can't convert " + x + " to Long")
     }
   }
@@ -28,6 +29,7 @@ object USnowflakeSerializer extends Serializer[ULong] {
   override def deserialize(implicit format: Formats): PartialFunction[(TypeInfo, JValue), ULong] = {
     case (TypeInfo(`uLongClazz`, _), json) => json match {
       case JString(s) => ULong(s)
+      case JInt(i) => ULong(i.toLong)
       case x => throw new MappingException("Can't convert " + x + " to ULong")
     }
   }
