@@ -9,7 +9,6 @@ lazy val root = (project in file("."))
       "net.liftmodules" %% "json-extractor-ng_3.2" % "0.3.0",
       "com.typesafe.akka" %% "akka-actor" % "2.5.9",
       "com.typesafe.akka" %% "akka-stream" % "2.5.9",
-      "com.lihaoyi" %% "fastparse" % "1.0.0",
       "org.typelevel" %% "spire" % "0.14.1",
       "com.softwaremill.sttp" %% "core" % "1.1.5",
       "com.softwaremill.sttp" %% "akka-http-backend" % "1.1.5",
