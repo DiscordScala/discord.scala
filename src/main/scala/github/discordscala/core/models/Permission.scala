@@ -1,16 +1,30 @@
 package github.discordscala.core.models
 
+import github.discordscala.core.models.Permission._
+
 object Permissions {
 
   def apply(perms: Permission*): Permissions = new Permissions(perms)
 
+  def all = new Permissions(Seq(CreateInstantInvite, KickMembers, BanMembers, Administrator, ManageChannels, ManageGuild, AddReactions, ViewAuditLog, ViewChannel, SendMessages, SendTtsMessages, EmbedLinks, AttachFiles, ReadMessageHistory, MentionEveryone, UseExternalEmojis, Connect, Speak, MuteMembers, DeafenMembers, MoveMembers, UseVad, ChangeNickname, ManageNicknames, ManageRoles, ManageWebhooks, ManageEmoji))
+
+  def apply(perms: Long): Permissions = new Permissions(Permissions.all.permissions.filter(x => (x.value & perms) > 0))
+
   def unapply(arg: Permissions): Option[Seq[Permission]] = Some(arg.permissions)
+
+  def unapply(arg: Long): Option[Permissions] = Some(Permissions(arg))
 
 }
 
 class Permissions(val permissions: Seq[Permission]) {
 
+  def has(permission: Permission): Boolean = permissions.contains(permission)
+
+  def has(permissions: Long): Boolean = (this.toLong | permissions) > 0
+
   def toLong: Long = permissions.foldLeft(0l)((acc: Long, p: Permission) => acc | p.value)
+
+  override def toString: String = s"Permission(${permissions.mkString(", ")})"
 
 }
 
@@ -160,7 +174,7 @@ object Permission {
 
   case object ManageEmoji extends Permission {
     val id = "MANAGE_EMOJI"
-    val value = 0x4i0000000
+    val value = 0x40000000
   }
 
 }

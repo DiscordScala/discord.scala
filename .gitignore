@@ -110,3 +110,5 @@ project/plugins/project/
 ### Enterprise Standards ###
 
 .idea/
+
+.ensime_cache/
