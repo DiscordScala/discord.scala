@@ -24,10 +24,10 @@ case class Permissions(permissions: Set[Permission]) {
 
   def+(other: Any): Permissions = this | other
 
-  def |(other: Any): Permissions = Permission(other match {
+  def |(other: Any): Permissions = Permissions(other match {
     case perms: Permissions => perms.toLong | this.toLong
     case perm: Permission => perm.value | this.toLong
-    case perm: Long => perm | this.toLong
+    case perm: Number => perm.longValue() | this.toLong
     case _ => 0
   })
 
@@ -36,7 +36,7 @@ case class Permissions(permissions: Set[Permission]) {
   def \(other: Any): Permissions = Permissions(other match {
     case perms: Permissions => this.toLong - (this.toLong & perms.toLong)
     case perm: Permission => this.toLong - (this.toLong & perm.value)
-    case perm: Long => this.toLong - (this.toLong & perm)
+    case perm: Number => this.toLong - (this.toLong & perm.longValue())
     case _ => 0
   })
 

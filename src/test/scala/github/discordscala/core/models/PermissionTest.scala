@@ -21,4 +21,20 @@ class PermissionTest extends FlatSpec with Matchers {
     permissions should be (Permissions(Permission.Speak, Permission.MentionEveryone))
   }
 
+  it should "add correctly" in {
+    val permissions1 = Permissions(0x00200000)
+    val permissions2 = Permissions(0x00020000)
+    (permissions1 + permissions2) should be (Permissions(0x00220000))
+    (permissions1 + Permission.MentionEveryone) should be (Permissions(0x00220000))
+    (permissions1 + 0x00020000) should be (Permissions(0x00220000))
+  }
+
+  it should "subtract correctly" in {
+    val permissions1 = Permissions(0x00220000)
+    val permissions2 = Permissions(0x00020000)
+    (permissions1 - permissions2) should be (Permissions(0x00200000))
+    (permissions1 - Permission.MentionEveryone) should be (Permissions(0x00200000))
+    (permissions1 - 0x00020000) should be (Permissions(0x00200000))
+  }
+
 }
