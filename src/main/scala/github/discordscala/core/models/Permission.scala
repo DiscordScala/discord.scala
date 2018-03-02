@@ -22,23 +22,20 @@ case class Permissions(permissions: Set[Permission]) {
 
   def has(permissions: Long): Boolean = (this.toLong & permissions) > 0
 
-  def+(other: Any): Permissions = this | other
+  def |(other: Permissions): Permissions = Permissions(other.toLong | this.toLong)
+  def +(other: Permissions): Permissions = |(other)
+  def \(other: Permissions): Permissions = Permissions(this.toLong - (this.toLong & other.toLong))
+  def -(other: Permissions): Permissions = \(other)
 
-  def |(other: Any): Permissions = Permissions(other match {
-    case perms: Permissions => perms.toLong | this.toLong
-    case perm: Permission => perm.value | this.toLong
-    case perm: Number => perm.longValue() | this.toLong
-    case _ => 0
-  })
+  def |(other: Permission): Permissions = Permissions(other.value | this.toLong)
+  def +(other: Permission): Permissions = |(other)
+  def \(other: Permission): Permissions = Permissions(this.toLong - (this.toLong & other.value))
+  def -(other: Permission): Permissions = \(other)
 
-  def -(other: Any): Permissions = this \ other
-
-  def \(other: Any): Permissions = Permissions(other match {
-    case perms: Permissions => this.toLong - (this.toLong & perms.toLong)
-    case perm: Permission => this.toLong - (this.toLong & perm.value)
-    case perm: Number => this.toLong - (this.toLong & perm.longValue())
-    case _ => 0
-  })
+  def |(other: Long): Permissions = Permissions(other | this.toLong)
+  def +(other: Long): Permissions = |(other)
+  def \(other: Long): Permissions = Permissions(this.toLong - (this.toLong & other))
+  def -(other: Long): Permissions = \(other)
 
   def toLong: Long = permissions.foldLeft(0l)((acc: Long, p: Permission) => acc | p.value)
 
