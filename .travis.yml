@@ -1,3 +1,9 @@
 language: scala
 scala:
-   - 2.12.2
+   - 2.12.4
+after_success:
+  - chmod +x webhook.sh
+  - ./webhook.sh success $WEBHOOK_URL
+after_failure:
+  - chmod +x webhook.sh
+  - ./webhook.sh failure $WEBHOOK_URL
