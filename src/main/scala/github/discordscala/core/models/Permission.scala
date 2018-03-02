@@ -4,23 +4,41 @@ import github.discordscala.core.models.Permission._
 
 object Permissions {
 
-  def apply(perms: Permission*): Permissions = new Permissions(perms)
+  def apply(perms: Permission*): Permissions = new Permissions(perms.toSet)
 
-  def all = new Permissions(Seq(CreateInstantInvite, KickMembers, BanMembers, Administrator, ManageChannels, ManageGuild, AddReactions, ViewAuditLog, ViewChannel, SendMessages, SendTtsMessages, EmbedLinks, AttachFiles, ReadMessageHistory, MentionEveryone, UseExternalEmojis, Connect, Speak, MuteMembers, DeafenMembers, MoveMembers, UseVad, ChangeNickname, ManageNicknames, ManageRoles, ManageWebhooks, ManageEmoji))
+  def all = new Permissions(Set(CreateInstantInvite, KickMembers, BanMembers, Administrator, ManageChannels, ManageGuild, AddReactions, ViewAuditLog, ViewChannel, SendMessages, SendTtsMessages, EmbedLinks, AttachFiles, ReadMessageHistory, MentionEveryone, UseExternalEmojis, Connect, Speak, MuteMembers, DeafenMembers, MoveMembers, UseVad, ChangeNickname, ManageNicknames, ManageRoles, ManageWebhooks, ManageEmoji))
 
   def apply(perms: Long): Permissions = new Permissions(Permissions.all.permissions.filter(x => (x.value & perms) > 0))
 
-  def unapply(arg: Permissions): Option[Seq[Permission]] = Some(arg.permissions)
+  def unapply(arg: Permissions): Option[Set[Permission]] = Some(arg.permissions)
 
   def unapply(arg: Long): Option[Permissions] = Some(Permissions(arg))
 
 }
 
-class Permissions(val permissions: Seq[Permission]) {
+case class Permissions(permissions: Set[Permission]) {
 
   def has(permission: Permission): Boolean = permissions.contains(permission)
 
-  def has(permissions: Long): Boolean = (this.toLong | permissions) > 0
+  def has(permissions: Long): Boolean = (this.toLong & permissions) > 0
+
+  def+(other: Any): Permissions = this | other
+
+  def |(other: Any): Permissions = Permission(other match {
+    case perms: Permissions => perms.toLong | this.toLong
+    case perm: Permission => perm.value | this.toLong
+    case perm: Long => perm | this.toLong
+    case _ => 0
+  })
+
+  def -(other: Any): Permissions = this \ other
+
+  def \(other: Any): Permissions = Permissions(other match {
+    case perms: Permissions => this.toLong - (this.toLong & perms.toLong)
+    case perm: Permission => this.toLong - (this.toLong & perm.value)
+    case perm: Long => this.toLong - (this.toLong & perm)
+    case _ => 0
+  })
 
   def toLong: Long = permissions.foldLeft(0l)((acc: Long, p: Permission) => acc | p.value)
 
