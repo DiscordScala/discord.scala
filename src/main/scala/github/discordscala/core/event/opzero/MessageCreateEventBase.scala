@@ -4,14 +4,13 @@ import github.discordscala.core._
 import github.discordscala.core.event.{WebsocketEvent, WebsocketEventBase, WebsocketListener}
 import github.discordscala.core.models.snowflake.Message
 import net.liftweb.json.JsonAST
-import net.liftmodules.jsonextractorng.Extraction._
 
 object MessageCreateEventBase extends WebsocketEventBase[MessageCreateEvent] {
 
   override def apply(v: JsonAST.JValue, c: Client, w: WebsocketListener): MessageCreateEvent = {
     try {
       implicit val client: Client = c
-      val m = v.extractNg[Message]
+      val m = v.extract/*Ng*/[Message] // TODO use NG
       MessageCreateEvent(m)(w.shard)
     } catch {
       case e: Exception => e.printStackTrace(); null

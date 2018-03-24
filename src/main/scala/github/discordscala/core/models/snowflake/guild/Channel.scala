@@ -94,7 +94,7 @@ object Channel {
 
   def apply(id: ULong)(implicit client: Client): Either[DiscordException, Channel] = RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$id", Map("Authorization" -> client.token)) match {
     case Left(e) => Left(e)
-    case Right(j) => Right(j.extractNg[Channel])
+    case Right(j) => Right(j.extract/*Ng*/[Channel]) // TODO use NG
   }
 
 }
