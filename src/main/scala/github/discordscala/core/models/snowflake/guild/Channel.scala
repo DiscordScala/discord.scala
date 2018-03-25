@@ -68,7 +68,7 @@ case class Channel(
       case Some(i) =>
         RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$i/messages", Map("Authorization" -> client.token), Post, Extraction.decompose(m), Duration.Inf) match {
           case Left(e) => Left(e)
-          case Right(j) => Right(j.extractNg[Message])
+          case Right(j) => Right(j.extract/*Ng*/[Message])
         }
       case None => Left(CombinedOrUnknown)
     }

@@ -1,7 +1,7 @@
 package github.discordscala.core.event
 
 import akka.NotUsed
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.ActorRef
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.ws.{Message, TextMessage, WebSocketRequest, WebSocketUpgradeResponse}
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
@@ -46,26 +46,16 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
 
   var currentRequest: (ActorRef, (Future[WebSocketUpgradeResponse], UniqueKillSwitch)) = _
 
-  lazy val requiredHandlers: Traversable[ActorRef] = {
-    class HelloHandler() extends Actor {
-      def receive: PartialFunction[Any, Unit] = {
-        case HelloEvent(d) =>
-          heartbeatThread = new Thread(() => {
-            while (true) {
-              currentRequest._1.heartbeat(HeartbeatEvent(lastSequence))
-              Thread.sleep(d.heartbeatInterval.toLong)
-            }
-          })
-          heartbeatThread.start()
-          currentRequest._1.identify()
-      }
-    }
-    try {
-      val ref = system.actorOf(Props(new HelloHandler), "helloHandler")
-      Seq(ref)
-    } catch {
-      case e: Exception => e.printStackTrace(); Seq()
-    }
+  lazy val requiredHandlers: PartialFunction[WebsocketEvent, Unit] = {
+    case HelloEvent(d) =>
+      heartbeatThread = new Thread(() => {
+        while (true) {
+          currentRequest._1.heartbeat(HeartbeatEvent(lastSequence))
+          Thread.sleep(d.heartbeatInterval.toLong)
+        }
+      })
+      heartbeatThread.start()
+      currentRequest._1.identify()
   }
 
   def startRequest: (ActorRef, (Future[WebSocketUpgradeResponse], UniqueKillSwitch)) = {
@@ -104,15 +94,9 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
       }
       web match {
         case Some(nob) =>
-          val completeSet = requiredHandlers ++ c.eventHandlers
           val event = nob(jast \ "d", c, this)
-          completeSet.foreach((s) => {
-            try {
-              s ! event
-            } catch {
-              case e: Exception => e.printStackTrace()
-            }
-          })
+          if(requiredHandlers.isDefinedAt(event)) requiredHandlers(event)
+          if(c.handler.isDefinedAt(event)) c.handler(event)
         case None =>
       }
     } catch {

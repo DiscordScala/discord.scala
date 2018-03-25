@@ -2,13 +2,14 @@ package github.discordscala.core.models.snowflake
 
 import java.time.Instant
 
-import github.discordscala.core.Client
+import github.discordscala.core._
 import github.discordscala.core.models.snowflake.guild.Channel
-import github.discordscala.core.util.{CombinedOrUnknown, DiscordException}
+import github.discordscala.core.util.{CombinedOrUnknown, DiscordException, Patch, RequestUtil}
+import net.liftweb.json.Extraction // TODO use NG
 import net.liftweb.json.JsonAST.JValue
 import spire.math.ULong
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
 
 /**
@@ -55,16 +56,25 @@ case class Message( // TODO convert JValues into their respective objects
   override type Self = Message
 
   override def !(implicit client: Client) : Either[DiscordException, Message] = {
-    channelId match {
-      case Some(i) => Channel(i) match {
-        case Left(e) => Left(e)
-        case Right(c) => id match {
-          case Some(m) => Await.result(c.message(m), Duration.Inf) match {
-            case Left(n) => Left(n)
-            case Right(o) => Right(o)
-          }
-          case None => Left(CombinedOrUnknown)
+    channelId.map(Channel(_)) match {
+      case Some(Right(c)) => id match {
+        case Some(m) => Await.result(c.message(m), Duration.Inf) match {
+          case Left(n) => Left(n)
+          case Right(o) => Right(o)
         }
+        case None => Left(CombinedOrUnknown)
+      }
+      case Some(Left(e)) => Left(e)
+      case None => Left(CombinedOrUnknown)
+    }
+  }
+
+  def edit(newMessage: Message)(implicit client: Client): Future[Either[DiscordException, Message]] = Future {
+    channelId match {
+      case Some(cid) => id match {
+        case Some(mid) =>
+          RequestUtil.awaitRestRequestFuture(client.apiURL + s"channels/$cid/messages/$mid", Map("Authorization" -> client.token), Patch, body = Extraction.decompose(newMessage), timeout = Duration.Inf).map(_.extract/*Ng*/[Message])
+        case None => Left(CombinedOrUnknown)
       }
       case None => Left(CombinedOrUnknown)
     }
