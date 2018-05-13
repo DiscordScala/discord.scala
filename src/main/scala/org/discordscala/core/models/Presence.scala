@@ -7,8 +7,10 @@ case class Presence(
                      user: Option[User] = None,
                      roles: Option[Array[ULong]] = None,
                      game: Option[Game] = None,
-                     guild_id: Option[ULong] = None,
+                     guildId: Option[ULong] = None,
                      status: Option[String] = None, // TODO make sealed trait and case class and custom serializer
+                     since: Option[Long] = None,
+                     afk: Option[Boolean] = None
                    ) {
 
 }

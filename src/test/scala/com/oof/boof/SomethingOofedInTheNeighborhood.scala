@@ -1,9 +1,10 @@
 package com.oof.boof
 
-import akka.actor.ActorSystem
+import net.liftweb.json._
 import org.discordscala.core.Client
 import org.discordscala.core.event.Sharding
 import org.discordscala.core.event.opzero.MessageCreateEvent
+import org.discordscala.core.models.{Game, Presence}
 import org.discordscala.core.models.snowflake.Message
 import org.discordscala.core.models.snowflake.guild.Channel
 import spire.math.ULong
@@ -15,7 +16,7 @@ object SomethingOofedInTheNeighborhood {
 
   def main(args: Array[String]): Unit = {
     implicit val sharding: Sharding = Sharding(1)
-    val myActorSystem = ActorSystem("ClientActorSystem")
+    implicit val formats = org.discordscala.core.formats
     val c = Client("Bot [token]", handler = {
       case me: MessageCreateEvent =>
         val m = me.d
