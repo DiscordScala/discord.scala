@@ -1,11 +1,11 @@
 package com.oof.boof
 
 import akka.actor.ActorSystem
-import github.discordscala.core.Client
-import github.discordscala.core.event.Sharding
-import github.discordscala.core.event.opzero.MessageCreateEvent
-import github.discordscala.core.models.snowflake.Message
-import github.discordscala.core.models.snowflake.guild.Channel
+import org.discordscala.core.Client
+import org.discordscala.core.event.Sharding
+import org.discordscala.core.event.opzero.MessageCreateEvent
+import org.discordscala.core.models.snowflake.Message
+import org.discordscala.core.models.snowflake.guild.Channel
 import spire.math.ULong
 
 import scala.concurrent.Await
@@ -29,12 +29,12 @@ object SomethingOofedInTheNeighborhood {
                   case Some(cid) =>
                     Channel(cid) match {
                       case Left(e) => println(e)
-                      case Right(c) =>
-                        c.postMessage(Message(content = Some("<:tsundredab:384083757558398976>")))
+                      case Right(ch) =>
+                        ch.postMessage(Message(content = Some("<:tsundredab:384083757558398976>")))
                     }
                   case None =>
                 }
-              case Some("chan!ping") => {
+              case Some("chan!ping") =>
                 m.channelId match {
                   case Some(cid) =>
                     Channel(cid) match {
@@ -50,7 +50,6 @@ object SomethingOofedInTheNeighborhood {
                     }
                   case None =>
                 }
-              }
               case _ =>
             }
         }

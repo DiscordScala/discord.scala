@@ -1,7 +1,7 @@
 package com.oof.boof
 
-import github.discordscala.core._
-import github.discordscala.core.models.snowflake.guild.Channel
+import org.discordscala.core._
+import org.discordscala.core.models.snowflake.guild.Channel
 import net.liftweb.json._
 import net.liftmodules.jsonextractorng.Extraction._
 
