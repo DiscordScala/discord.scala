@@ -49,7 +49,7 @@ case class Message( // TODO convert JValues into their respective objects
                     reactions: Option[Array[JValue]] = None,
                     nonce: Option[ULong] = None,
                     pinned: Option[Boolean] = None,
-                    webhookId: Option[Boolean] = None,
+                    webhookId: Option[ULong] = None,
                     `type`: Option[Int] = None
                   ) extends Snowflaked {
 
