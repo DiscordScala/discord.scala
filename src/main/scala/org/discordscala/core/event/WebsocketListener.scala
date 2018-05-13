@@ -89,7 +89,6 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
           new String(result, 0, len, "UTF-8")
       }
       val jast = correctInput(parse(js))
-      println(compactRender(jast))
       val s = jast \ "s"
       s match {
         case JInt(n) => lastSequence = Some(n.intValue())
@@ -126,7 +125,6 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
       val corrected = j transformField {
         case JField(key, value) => JField(keyDeCorrectionReg.replaceAllIn(key, m => s"_${m.matched.toLowerCase}"), value)
       }
-      println(compactRender(corrected))
       ar ! TextMessage(compactRender(corrected))
     }
 
