@@ -33,8 +33,8 @@ object HeartbeatEventBase extends WebsocketEventBase[HeartbeatEvent] {
     *
     * @return OP code of the event
     */
-  override def eventOp: Int = 11
+  override def eventOp: Int = 1
 
 }
 
-case class HeartbeatEvent(d: Option[Int]) extends GatewayPayload(11)
+case class HeartbeatEvent(d: Option[Int]) extends GatewayPayload(1)

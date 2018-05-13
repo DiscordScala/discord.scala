@@ -1,16 +1,18 @@
 package org.discordscala.core.event
 
+import java.util.zip.Inflater
+
 import akka.NotUsed
 import akka.actor.ActorRef
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.ws.{Message, TextMessage, WebSocketRequest, WebSocketUpgradeResponse}
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.{Client => _, _}
+import net.liftweb.json._
+import org.clapper.classutil.ClassFinder
 import org.discordscala.core._
 import org.discordscala.core.event.opnonzero.{HeartbeatEvent, HelloEvent}
 import org.discordscala.core.event.payload.{GatewayIdentificationData, IdentifyPayload}
-import net.liftweb.json._
-import org.clapper.classutil.ClassFinder
 
 import scala.collection.mutable
 import scala.concurrent.duration.Duration
@@ -69,8 +71,25 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
 
   def handleGateway(m: Message): Future[Unit] = Future {
     try {
-      val js = m.asTextMessage.getStrictText
+      val js = try {
+        if(m.asTextMessage.isStrict) {
+          m.asTextMessage.getStrictText
+        } else {
+          m.asTextMessage.getStreamedText.runFold[String]("", (s1, s2) => {
+            s1 + s2
+          }, materializer).toCompletableFuture.get()
+        }
+      } catch {
+        case _: IllegalStateException =>
+          val bs = m.asBinaryMessage.getStrictData
+          val inf = new Inflater()
+          inf.setInput(bs.asByteBuffer.array())
+          val result = Array.fill(2048)(0.toByte)
+          val len = inf.inflate(result)
+          new String(result, 0, len, "UTF-8")
+      }
       val jast = correctInput(parse(js))
+      println(compactRender(jast))
       val s = jast \ "s"
       s match {
         case JInt(n) => lastSequence = Some(n.intValue())
@@ -96,7 +115,7 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
   }
 
   def correctInput(v: JValue): JValue = v transformField {
-    case JField(key, value) => JField(keyCorrectionReg.replaceAllIn(key, (m) => m.group(1).toUpperCase), value)
+    case JField(key, value) => JField(keyCorrectionReg.replaceAllIn(key, m => m.group(1).toUpperCase), value)
   }
 
   implicit class GatewayWebsocket(ar: ActorRef) {
@@ -107,7 +126,8 @@ class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Shar
       val corrected = j transformField {
         case JField(key, value) => JField(keyDeCorrectionReg.replaceAllIn(key, m => s"_${m.matched.toLowerCase}"), value)
       }
-      ar ! TextMessage(compactRender(j))
+      println(compactRender(corrected))
+      ar ! TextMessage(compactRender(corrected))
     }
 
     def heartbeat(e: HeartbeatEvent): Future[Unit] = submit(Extraction.decompose(e))
