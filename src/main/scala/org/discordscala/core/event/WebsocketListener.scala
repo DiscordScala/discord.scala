@@ -13,6 +13,7 @@ import org.clapper.classutil.ClassFinder
 import org.discordscala.core._
 import org.discordscala.core.cache.DiscordCache
 import org.discordscala.core.event.opnonzero.{HeartbeatEvent, HelloEvent}
+import org.discordscala.core.event.opzero.{MessageCreateEvent, MessageUpdateEvent}
 import org.discordscala.core.event.payload.{GatewayIdentificationData, IdentifyPayload}
 
 import scala.collection.mutable
@@ -37,6 +38,10 @@ class WebsocketListener(val c: Client, val shard: Shard, val cache: Option[Disco
       })
       heartbeatThread.start()
       currentRequest._1.identify()
+    case MessageCreateEvent(m) =>
+      cache.foreach(_.messages += m)
+    case MessageUpdateEvent(m) =>
+      cache.foreach(_.messages += m)
   }
 
   implicit val materializer: Materializer = ActorMaterializer()
