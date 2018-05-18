@@ -6,6 +6,7 @@ import org.discordscala.core.models.snowflake.guild.Guild
 import org.discordscala.core.util._
 import net.liftmodules.jsonextractorng.Extraction._
 import net.liftweb.json._
+import org.discordscala.core.cache.{DiscordCache, WeakDiscordCache}
 import spire.math.ULong
 
 import scala.concurrent.Future
@@ -21,14 +22,14 @@ import scala.concurrent.Future
   * @param myShards   The shards that this specific client has control over. Multiple clients may be on different servers and control different shards
   * @param sharding   Shard specification for this client
   */
-case class Client(token: String, handler: PartialFunction[WebsocketEvent, Unit], gatewayURL: String = "wss://gateway.discord.gg/?v=6&encoding=json", apiURL: String = "https://discordapp.com/api/v6/", myShards: Set[Int])(implicit sharding: Sharding) {
+case class Client(token: String, handler: PartialFunction[WebsocketEvent, Unit], gatewayURL: String = "wss://gateway.discord.gg/?v=6&encoding=json", apiURL: String = "https://discordapp.com/api/v6/", myShards: Set[Int], cache: Option[DiscordCache] = Some(new WeakDiscordCache))(implicit sharding: Sharding) {
 
   implicit val client: Client = this
 
   /**
     * List of Listeners per Shard
     */
-  lazy val shards: Map[Int, Shard] = myShards.map(sc => sc -> Shard(this, sc)).toMap
+  lazy val shards: Map[Int, Shard] = myShards.map(sc => sc -> Shard(this, sc, cache)).toMap
 
   /**
     * Access the user the client logged in as

@@ -2,7 +2,7 @@ lazy val root = (project in file("."))
   .settings(
     name         := "core",
     organization := "org.discordscala",
-    scalaVersion := "2.12.5",
+    scalaVersion := "2.12.6",
     version := "0.1.0",
     libraryDependencies ++= Seq(
       "net.liftweb" %% "lift-json" % "3.2.0",

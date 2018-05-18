@@ -11,6 +11,7 @@ import akka.stream.{Client => _, _}
 import net.liftweb.json._
 import org.clapper.classutil.ClassFinder
 import org.discordscala.core._
+import org.discordscala.core.cache.DiscordCache
 import org.discordscala.core.event.opnonzero.{HeartbeatEvent, HelloEvent}
 import org.discordscala.core.event.payload.{GatewayIdentificationData, IdentifyPayload}
 
@@ -21,7 +22,7 @@ import scala.math.BigInt
 import scala.reflect.runtime.{universe => ru}
 import scala.util.matching.Regex
 
-class WebsocketListener(val c: Client, val shard: Shard)(implicit sharding: Sharding) {
+class WebsocketListener(val c: Client, val shard: Shard, val cache: Option[DiscordCache])(implicit sharding: Sharding) {
 
   lazy val req = WebSocketRequest(c.gatewayURL)
   lazy val messageSource: Source[Message, ActorRef] = Source.actorRef[TextMessage.Strict](bufferSize = 1000, OverflowStrategy.fail)

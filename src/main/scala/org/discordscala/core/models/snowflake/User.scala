@@ -1,6 +1,6 @@
 package org.discordscala.core.models.snowflake
 
-import org.discordscala.core.models.snowflake.guild.{Guild, Member}
+import org.discordscala.core.models.snowflake.guild.{Guild, GuildedMember, Member}
 import org.discordscala.core.{Client, _}
 import org.discordscala.core.util.{DiscordException, RequestUtil}
 import spire.math.ULong
@@ -30,7 +30,7 @@ case class User(
 
   override type Self = User
 
-  def asMemberOf(g: Guild): Member = {
+  def asMemberOf(g: Guild): GuildedMember = {
     null // FIXME complete this @gerd
   }
 

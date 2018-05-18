@@ -5,10 +5,11 @@ import akka.http.scaladsl.model.ws.TextMessage
 import org.discordscala.core.event.{Sharding, WebsocketListener}
 import net.liftweb.json.JsonAST.JValue
 import net.liftweb.json._
+import org.discordscala.core.cache.DiscordCache
 
-case class Shard(client: Client, shardNumber: Int)(implicit sharding: Sharding) {
+case class Shard(client: Client, shardNumber: Int, cache: Option[DiscordCache])(implicit sharding: Sharding) {
 
-  val websocketListener: WebsocketListener = new WebsocketListener(client, this)
+  val websocketListener: WebsocketListener = new WebsocketListener(client, this, cache)
 
   def start(): Unit = websocketListener.start()
 

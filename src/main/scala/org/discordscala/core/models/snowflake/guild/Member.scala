@@ -3,8 +3,9 @@ package org.discordscala.core.models.snowflake.guild
 import java.time.Instant
 
 import org.discordscala.core._
-import org.discordscala.core.models.snowflake.User
-import org.discordscala.core.util.{DiscordException}
+import org.discordscala.core.models.snowflake.{Snowflaked, User}
+import org.discordscala.core.util.DiscordException
+import org.discordscala.core.util.DiscordException.CombinedOrUnknown
 import spire.math.ULong
 
 import scala.concurrent.duration.Duration
@@ -32,6 +33,25 @@ case class Member(
           Right(a.filter(_.isRight).map(_.right.get).filter(_.isDefined).map(_.get))
         }
       case None => Left(DiscordException.CombinedOrUnknown)
+    }
+  }
+
+}
+
+case class GuildedMember(guild: Guild, member: Member) extends Snowflaked {
+
+  override val id: Option[ULong] = member.user.flatMap(_.id)
+
+  override type Self = GuildedMember
+
+  override def !(implicit client: Client): Either[DiscordException, GuildedMember] = {
+    guild.! match {
+      case Left(e) => Left(e)
+      case Right(g) => member.user.map(_.!) match {
+        case Some(Left(e)) => Left(e)
+        case None => Left(CombinedOrUnknown)
+        case Some(Right(u)) => Right(u.asMemberOf(g))
+      }
     }
   }
 
