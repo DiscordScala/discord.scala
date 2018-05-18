@@ -1,7 +1,7 @@
 package org.discordscala.core.event.opzero
 
 import net.liftweb.json.JsonAST
-import org.discordscala.core.{Client, Shard}
+import org.discordscala.core._
 import org.discordscala.core.event.{WebsocketEvent, WebsocketEventBase, WebsocketListener}
 import org.discordscala.core.models.snowflake.Message
 
