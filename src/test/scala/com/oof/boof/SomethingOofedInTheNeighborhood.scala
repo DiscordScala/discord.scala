@@ -17,7 +17,7 @@ object SomethingOofedInTheNeighborhood {
   def main(args: Array[String]): Unit = {
     implicit val sharding: Sharding = Sharding(1)
     implicit val formats = org.discordscala.core.formats
-    val c = Client("Bot Mzk4OTc0NzgxNDA1NTI4MDY0.DTGXXQ.cU1_uWludVY8NdabrSVjaCkERCw", handler = {
+    val c = Client("Bot [token]", handler = {
       case me: MessageCreateEvent =>
         val m = me.d
         implicit val client: Client = me.shard.client
