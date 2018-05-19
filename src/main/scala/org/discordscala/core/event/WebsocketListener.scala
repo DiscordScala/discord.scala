@@ -41,7 +41,7 @@ class WebsocketListener(val c: Client, val shard: Shard, val cache: Option[Disco
     case MessageCreateEvent(m) =>
       cache.foreach(_.messages += m)
     case MessageUpdateEvent(m) =>
-      cache.foreach(_.messages += m)
+      cache.foreach(_.messages.+=(m, interpolate = true))
   }
 
   implicit val materializer: Materializer = ActorMaterializer()

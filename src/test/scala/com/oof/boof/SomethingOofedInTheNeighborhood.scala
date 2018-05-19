@@ -3,7 +3,7 @@ package com.oof.boof
 import net.liftweb.json._
 import org.discordscala.core.Client
 import org.discordscala.core.event.Sharding
-import org.discordscala.core.event.opzero.MessageCreateEvent
+import org.discordscala.core.event.opzero.{MessageCreateEvent, MessageUpdateEvent}
 import org.discordscala.core.models.{Game, Presence}
 import org.discordscala.core.models.snowflake.Message
 import org.discordscala.core.models.snowflake.guild.Channel
@@ -17,7 +17,7 @@ object SomethingOofedInTheNeighborhood {
   def main(args: Array[String]): Unit = {
     implicit val sharding: Sharding = Sharding(1)
     implicit val formats = org.discordscala.core.formats
-    val c = Client("Bot [token]", handler = {
+    val c = Client("Bot Mzk4OTc0NzgxNDA1NTI4MDY0.DTGXXQ.cU1_uWludVY8NdabrSVjaCkERCw", handler = {
       case me: MessageCreateEvent =>
         val m = me.d
         implicit val client: Client = me.shard.client
@@ -52,6 +52,15 @@ object SomethingOofedInTheNeighborhood {
                   case None =>
                 }
               case _ =>
+            }
+        }
+      case mue: MessageUpdateEvent =>
+        implicit val client: Client = mue.shard.client
+         mue.shard.cache match {
+          case Some(cache) =>
+            Channel(ULong(390752467878412288l)) match {
+              case Left(e) => println(e)
+              case Right(ch) => ch.postMessage(Message(content = Some((cache.messages / mue.d).map(_.content).filter(_.isDefined).map(_.get).mkString("\n\n"))))
             }
         }
     }, myShards = Set(0))

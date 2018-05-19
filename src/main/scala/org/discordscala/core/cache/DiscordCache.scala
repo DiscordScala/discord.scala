@@ -22,7 +22,9 @@ object DiscordCache {
     def /(t: T): Traversable[T]
   }
 
-  trait DiscordMessages extends DiscordCacheObject[Message]
+  trait DiscordMessages extends DiscordCacheObject[Message] {
+    def +=(t: Message, interpolate: Boolean): Unit
+  }
   trait DiscordChannels extends DiscordCacheObject[Channel]
   trait DiscordGuilds extends DiscordCacheObject[Guild]
   trait DiscordMembers extends DiscordCacheObject[GuildedMember]
