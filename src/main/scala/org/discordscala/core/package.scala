@@ -10,6 +10,7 @@ import com.softwaremill.sttp.akkahttp.AkkaHttpBackend
 import org.discordscala.core.models.snowflake.Snowflaked
 import org.discordscala.core.serializers._
 import net.liftweb.json._
+import org.discordscala.core.util.Overlay
 import spire.math.ULong
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
@@ -55,6 +56,10 @@ package object core {
       }
     }
 
+  }
+
+  implicit class OverlayOps[A](a: A)(implicit ev: Overlay[A]) {
+    def over(b: A): A = ev(a, b)
   }
 
 }

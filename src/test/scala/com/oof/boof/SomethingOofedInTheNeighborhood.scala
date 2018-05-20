@@ -1,10 +1,8 @@
 package com.oof.boof
 
-import net.liftweb.json._
 import org.discordscala.core.Client
 import org.discordscala.core.event.Sharding
 import org.discordscala.core.event.opzero.{MessageCreateEvent, MessageUpdateEvent}
-import org.discordscala.core.models.{Game, Presence}
 import org.discordscala.core.models.snowflake.Message
 import org.discordscala.core.models.snowflake.guild.Channel
 import spire.math.ULong
