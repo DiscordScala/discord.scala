@@ -13,8 +13,8 @@ trait Snowflaked extends Ordered[Snowflaked] {
 
   val id: Option[ULong]
 
-  def !(implicit client: Client): Either[DiscordException, Self]
-
   final override def compare(that: Snowflaked): Int = (that.id.getOrElse(ULong(-1)) - this.id.getOrElse(ULong(-1))).toInt
+
+  def !(implicit client: Client): Either[DiscordException, Self]
 
 }

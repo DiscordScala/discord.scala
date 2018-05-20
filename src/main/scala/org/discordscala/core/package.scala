@@ -7,9 +7,9 @@ import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import com.softwaremill.sttp.SttpBackend
 import com.softwaremill.sttp.akkahttp.AkkaHttpBackend
+import net.liftweb.json._
 import org.discordscala.core.models.snowflake.Snowflaked
 import org.discordscala.core.serializers._
-import net.liftweb.json._
 import org.discordscala.core.util.Overlay
 import spire.math.ULong
 

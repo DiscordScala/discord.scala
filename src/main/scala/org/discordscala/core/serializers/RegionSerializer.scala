@@ -1,8 +1,8 @@
 package org.discordscala.core.serializers
 
-import org.discordscala.core.models.Region
 import net.liftweb.json.JsonAST.JString
 import net.liftweb.json._
+import org.discordscala.core.models.Region
 
 object RegionSerializer extends Serializer[Region] {
 

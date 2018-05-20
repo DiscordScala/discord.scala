@@ -2,16 +2,16 @@ package org.discordscala.core.models.snowflake.guild
 
 import java.time.Instant
 
+import net.liftmodules.jsonextractorng.Extraction._
+import net.liftweb.json.Extraction
+import net.liftweb.json.JsonAST.JValue
 import org.discordscala.core._
 import org.discordscala.core.models.snowflake.{Message, Snowflaked, User}
 import org.discordscala.core.util._
-import net.liftweb.json.Extraction
-import net.liftmodules.jsonextractorng.Extraction._
-import net.liftweb.json.JsonAST.JValue
 import spire.math.ULong
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 case class Channel(
                     id: Option[ULong] = None,

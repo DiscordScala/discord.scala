@@ -1,10 +1,10 @@
 package org.discordscala.core.event.opnonzero
 
+import net.liftmodules.jsonextractorng.Extraction._
+import net.liftweb.json.JsonAST
 import org.discordscala.core._
 import org.discordscala.core.event.payload.GatewayPayload
 import org.discordscala.core.event.{WebsocketEventBase, WebsocketListener}
-import net.liftweb.json.JsonAST
-import net.liftmodules.jsonextractorng.Extraction._
 
 object HelloEventBase extends WebsocketEventBase[HelloEvent] {
 

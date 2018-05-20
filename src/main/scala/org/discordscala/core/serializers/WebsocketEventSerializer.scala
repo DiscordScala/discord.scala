@@ -1,7 +1,7 @@
 package org.discordscala.core.serializers
 
-import org.discordscala.core.event.WebsocketEvent
 import net.liftweb.json._
+import org.discordscala.core.event.WebsocketEvent
 
 object WebsocketEventSerializer extends Serializer[WebsocketEvent] {
 

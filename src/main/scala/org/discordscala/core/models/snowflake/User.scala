@@ -1,10 +1,10 @@
 package org.discordscala.core.models.snowflake
 
-import org.discordscala.core.models.snowflake.guild.{Guild, GuildedMember, Member}
-import org.discordscala.core.{Client, _}
-import org.discordscala.core.util.{DiscordException, RequestUtil}
-import spire.math.ULong
 import net.liftmodules.jsonextractorng.Extraction._
+import org.discordscala.core.models.snowflake.guild.{Guild, GuildedMember}
+import org.discordscala.core.util.{DiscordException, RequestUtil}
+import org.discordscala.core.{Client, _}
+import spire.math.ULong
 
 /**
   * Representation of an User

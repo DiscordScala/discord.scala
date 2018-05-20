@@ -1,8 +1,8 @@
 package org.discordscala.core.event.payload
 
-import org.discordscala.core.models.Presence
 import org.discordscala.core._
 import org.discordscala.core.event.WebsocketEvent
+import org.discordscala.core.models.Presence
 
 /**
   * IDENTIFY Payload of the Websocket (OP 2)

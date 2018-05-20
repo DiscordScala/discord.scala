@@ -2,36 +2,36 @@ package org.discordscala.core.models.snowflake
 
 import java.time.Instant
 
+import net.liftweb.json.Extraction
+import net.liftweb.json.JsonAST.JValue
 import org.discordscala.core._
 import org.discordscala.core.models.snowflake.guild.Channel
 import org.discordscala.core.util.{DiscordException, RequestMethod, RequestUtil}
-import net.liftweb.json.Extraction
-import net.liftweb.json.JsonAST.JValue
 import spire.math.ULong
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 /**
   * Representation of a message
   *
-  * @param id               ID of the message
+  * @param id              ID of the message
   * @param channelId       ID of the channel the message was sent in
-  * @param author           Author of the message
-  * @param content          Raw content of the message
-  * @param timestamp        Instant when the message was created
+  * @param author          Author of the message
+  * @param content         Raw content of the message
+  * @param timestamp       Instant when the message was created
   * @param editedTimestamp Instant when the message was last edited
-  * @param tts              Whether or not the message was sent with TTS enabled
+  * @param tts             Whether or not the message was sent with TTS enabled
   * @param mentionEveryone Whether or not the message contains a mention to everyone
-  * @param mentions         Users that the message mentions
+  * @param mentions        Users that the message mentions
   * @param mentionRoles    Roles that the message mentions
-  * @param attachments      Links to the attachements of the message
-  * @param embeds           JSON representation of an messages embed
-  * @param reactions        Reactions added to a message
-  * @param nonce            ??
-  * @param pinned           Whether or not the message was pinned
+  * @param attachments     Links to the attachements of the message
+  * @param embeds          JSON representation of an messages embed
+  * @param reactions       Reactions added to a message
+  * @param nonce           ??
+  * @param pinned          Whether or not the message was pinned
   * @param webhookId       ID of the webhhok the message was sent by (if applies)
-  * @param `type`           type of the message
+  * @param `type`          type of the message
   */
 case class Message( // TODO convert JValues into their respective objects
                     id: Option[ULong] = None,

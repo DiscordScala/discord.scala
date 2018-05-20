@@ -2,12 +2,12 @@ package org.discordscala.core.models.snowflake.guild
 
 import java.time.Instant
 
+import net.liftmodules.jsonextractorng.Extraction._
+import net.liftweb.json.JsonAST.JValue
 import org.discordscala.core._
 import org.discordscala.core.models.snowflake.{Snowflaked, User}
 import org.discordscala.core.models.{Presence, Region}
 import org.discordscala.core.util.{DiscordException, RequestUtil}
-import net.liftweb.json.JsonAST.JValue
-import net.liftmodules.jsonextractorng.Extraction._
 import spire.math.ULong
 
 case class Guild(

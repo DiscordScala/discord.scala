@@ -34,6 +34,8 @@ case class Permissions(permissions: Set[Permission]) {
 
   def |(other: Permission): Permissions = Permissions(other.value | this.toLong)
 
+  def toLong: Long = permissions.foldLeft(0l)((acc: Long, p: Permission) => acc | p.value)
+
   def -(other: Permission): Permissions = \(other)
 
   def \(other: Permission): Permissions = Permissions(this.toLong - (this.toLong & other.value))
@@ -41,8 +43,6 @@ case class Permissions(permissions: Set[Permission]) {
   def +(other: Long): Permissions = |(other)
 
   def |(other: Long): Permissions = Permissions(other | this.toLong)
-
-  def toLong: Long = permissions.foldLeft(0l)((acc: Long, p: Permission) => acc | p.value)
 
   def -(other: Long): Permissions = \(other)
 

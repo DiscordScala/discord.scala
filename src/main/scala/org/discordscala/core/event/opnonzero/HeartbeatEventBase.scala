@@ -1,11 +1,10 @@
 package org.discordscala.core.event.opnonzero
 
-import org.discordscala.core._
-import org.discordscala.core.Client
-import org.discordscala.core.event.{WebsocketEventBase, WebsocketListener}
-import org.discordscala.core.event.payload.GatewayPayload
-import net.liftweb.json.JsonAST
 import net.liftmodules.jsonextractorng.Extraction._
+import net.liftweb.json.JsonAST
+import org.discordscala.core.{Client, _}
+import org.discordscala.core.event.payload.GatewayPayload
+import org.discordscala.core.event.{WebsocketEventBase, WebsocketListener}
 
 object HeartbeatEventBase extends WebsocketEventBase[HeartbeatEvent] {
 

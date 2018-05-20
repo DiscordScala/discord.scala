@@ -1,12 +1,12 @@
 package org.discordscala.core
 
+import net.liftmodules.jsonextractorng.Extraction._
+import net.liftweb.json._
+import org.discordscala.core.cache.{DiscordCache, WeakDiscordCache}
 import org.discordscala.core.event.{Sharding, WebsocketEvent}
 import org.discordscala.core.models.snowflake.User
 import org.discordscala.core.models.snowflake.guild.Guild
 import org.discordscala.core.util._
-import net.liftmodules.jsonextractorng.Extraction._
-import net.liftweb.json._
-import org.discordscala.core.cache.{DiscordCache, WeakDiscordCache}
 import spire.math.ULong
 
 import scala.concurrent.Future

@@ -78,7 +78,7 @@ class WebsocketListener(val c: Client, val shard: Shard, val cache: Option[Disco
   def handleGateway(m: Message): Future[Unit] = Future {
     try {
       val js = try {
-        if(m.asTextMessage.isStrict) {
+        if (m.asTextMessage.isStrict) {
           m.asTextMessage.getStrictText
         } else {
           m.asTextMessage.getStreamedText.runFold[String]("", (s1, s2) => {
@@ -127,14 +127,14 @@ class WebsocketListener(val c: Client, val shard: Shard, val cache: Option[Disco
 
     def identify(): Future[Unit] = submit(Extraction.decompose(IdentifyPayload(GatewayIdentificationData(c.token, shard = Array(sharding.myListenerShards.find(_._2 == WebsocketListener.this).get._1, sharding.max_shards)))))
 
+    def heartbeat(e: HeartbeatEvent): Future[Unit] = submit(Extraction.decompose(e))
+
     def submit(j: JValue): Future[Unit] = Future {
       val corrected = j transformField {
         case JField(key, value) => JField(keyDeCorrectionReg.replaceAllIn(key, m => s"_${m.matched.toLowerCase}"), value)
       }
       ar ! TextMessage(compactRender(corrected))
     }
-
-    def heartbeat(e: HeartbeatEvent): Future[Unit] = submit(Extraction.decompose(e))
 
   }
 

@@ -40,9 +40,8 @@ case class Member(
 
 case class GuildedMember(guild: Guild, member: Member) extends Snowflaked {
 
-  override val id: Option[ULong] = member.user.flatMap(_.id)
-
   override type Self = GuildedMember
+  override val id: Option[ULong] = member.user.flatMap(_.id)
 
   override def !(implicit client: Client): Either[DiscordException, GuildedMember] = {
     guild.! match {

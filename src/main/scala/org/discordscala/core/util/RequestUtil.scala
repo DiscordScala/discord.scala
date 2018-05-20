@@ -5,9 +5,9 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import com.softwaremill.sttp._
-import org.discordscala.core._
 import net.liftweb.json.JsonAST.JValue
 import net.liftweb.json._
+import org.discordscala.core._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}

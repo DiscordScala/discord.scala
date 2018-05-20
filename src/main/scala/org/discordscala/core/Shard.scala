@@ -1,11 +1,12 @@
 package org.discordscala.core
 
-import scala.language.implicitConversions
 import akka.http.scaladsl.model.ws.TextMessage
-import org.discordscala.core.event.{Sharding, WebsocketListener}
 import net.liftweb.json.JsonAST.JValue
 import net.liftweb.json._
 import org.discordscala.core.cache.DiscordCache
+import org.discordscala.core.event.{Sharding, WebsocketListener}
+
+import scala.language.implicitConversions
 
 case class Shard(client: Client, shardNumber: Int, cache: Option[DiscordCache])(implicit sharding: Sharding) {
 

@@ -1,7 +1,7 @@
 package org.discordscala.core.event
 
-import org.discordscala.core.Client
 import net.liftweb.json.JsonAST.JValue
+import org.discordscala.core.Client
 
 /**
   * Should be extended by Objects. Bases are found via reflection, so no registering should be needed.

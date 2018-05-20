@@ -4,7 +4,7 @@ import java.awt.Color
 
 import org.discordscala.core._
 import org.discordscala.core.models.snowflake.Snowflaked
-import org.discordscala.core.util.{DiscordException}
+import org.discordscala.core.util.DiscordException
 import spire.math.ULong
 
 import scala.concurrent.duration.Duration
